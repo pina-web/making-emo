@@ -28,7 +28,7 @@
     --success: #65a30d;
     --info: #2563eb;
     --check-1: #ffffff;
-    --check-2: #e5e2dc;
+    --check-2: #b8b3a8;
 
     --font-display: 'Gowun Batang', 'Noto Serif KR', serif;
     --font-body: 'Noto Sans KR', 'Noto Sans', sans-serif;
@@ -256,6 +256,61 @@
   }
   .source-counter button.clear:hover { color: var(--danger); border-color: var(--danger); }
 
+  /* ─── Background side panel (sidebar) ─── */
+  .bg-side-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+  }
+  .bg-side-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .bg-side-row .bg-apply-all {
+    flex: 1;
+    justify-content: center;
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.25;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  .bg-side-row .bg-apply-all:hover { background: #9a330a; }
+  .bg-side-row .bg-clear-all {
+    background: var(--card-2);
+    color: var(--ink-2);
+    border-color: var(--border-strong);
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+  .bg-side-row .bg-clear-all:hover { color: var(--danger); border-color: var(--danger); }
+  .bg-sens-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  #bg-global-sens { flex: 1; }
+  .bg-sens-val {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 22px;
+    text-align: right;
+  }
+  .bg-side-hint {
+    margin-top: 8px;
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--ink-3);
+  }
+
   .sources-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -307,6 +362,25 @@
     padding: 0;
   }
   .src-thumb:hover .del { display: block; }
+  .src-thumb.bg-on {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(194, 65, 12, 0.25);
+  }
+  .src-thumb .bg-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 3px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    pointer-events: none;
+  }
 
   .quick-tips {
     background: var(--card);
@@ -1231,6 +1305,26 @@
       <div class="sources-grid" id="sources-grid"></div>
     </div>
 
+    <div>
+      <div class="section-label">03 · Background</div>
+      <div class="bg-side-panel">
+        <div class="bg-side-row">
+          <button class="btn bg-apply-all" onclick="applyBgRemoveToAllGlobal()">모든 이미지<br/>배경 제거</button>
+          <button class="btn bg-clear-all" onclick="clearBgRemoveAllGlobal()" title="전체 해제">× 해제</button>
+        </div>
+        <div class="bg-side-row" style="margin-top:8px">
+          <span class="bg-sens-label">민감도</span>
+          <input type="range" min="20" max="80" value="40" id="bg-global-sens" oninput="updateGlobalBgSensitivity(parseInt(this.value))">
+          <span class="bg-sens-val" id="bg-global-sens-val">40</span>
+        </div>
+        <div class="bg-side-hint">
+          흰색·크림·연한 파스텔 배경 자동 검출.<br>
+          개별 조정은 스티커 클릭 → 트랜스폼 바에서.<br>
+          <span style="color:var(--ink-3);font-size:9px">결과가 안 보이면 F12 → Console에서 처리 로그 확인</span>
+        </div>
+      </div>
+    </div>
+
     <div class="quick-tips">
       <strong>워크플로우</strong><br/>
       ① PNG 업로드 → ② 메인·탭 지정 → ③ 플랫폼별 옵션 설정 → ④ 미리보기 확인 → ⑤ ZIP·PDF 출력
@@ -1520,9 +1614,9 @@
             <strong style="color:var(--accent)">TIP</strong> 어두운 캐릭터·글씨일수록 5–8px 라인 권장. 가독성 좋은 캐릭터는 0–3px도 통과 가능.
           </div>
           <div style="margin-top:10px;padding:12px;background:#fff7ed;border:1px solid var(--accent);border-radius:4px;font-size:12px;color:var(--ink);line-height:1.5">
-            <strong style="display:block;margin-bottom:6px">🎨 일괄 배경 투명화</strong>
+            <strong style="display:block;margin-bottom:6px">🎨 일괄 배경 제거</strong>
             <div style="color:var(--ink-2);margin-bottom:8px;font-size:11px">DARK 미리보기에서 흰·크림색 배경이 보이는 이미지가 있다면 한 번에 처리</div>
-            <button class="btn" style="width:100%;justify-content:center;background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600" onclick="applyBgRemoveToAll('ogq')">모든 이미지 배경 투명화</button>
+            <button class="btn" style="width:100%;justify-content:center;background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600" onclick="applyBgRemoveToAll('ogq')">모든 이미지 배경 제거</button>
             <button class="btn ghost" style="width:100%;justify-content:center;margin-top:4px;font-size:11px;color:var(--ink-3)" onclick="clearBgRemoveAll('ogq')">전체 해제</button>
           </div>
         </div>
@@ -1775,7 +1869,7 @@ async function handleFiles(files) {
   }
   renderAll();
   if (bgDetectedCount > 0) {
-    toast(`${arr.length}개 추가됨 · 배경이 있는 이미지 ${bgDetectedCount}개 감지 → OGQ 탭에서 "배경 투명화" 권장`);
+    toast(`${arr.length}개 추가됨 · 배경이 있는 이미지 ${bgDetectedCount}개 감지 → OGQ 탭에서 "배경 제거" 권장`);
   } else {
     toast(`${arr.length}개 이미지 추가됨 (총 ${state.sources.length}개)`);
   }
@@ -1853,46 +1947,126 @@ function resizeImageToCanvas(img, targetW, targetH, fit = 'contain', scale = 1.0
    the dominant background color, then floods inward removing pixels within tolerance.
    White areas INSIDE the character (teeth, eyes, highlights) are preserved because
    they aren't connected to the edges. */
-function removeBackground(img, sensitivity = 30) {
+/* Background removal via edge-sampled cluster detection + tolerance flood fill.
+   Works on white, cream, pastel, light-yellow, light-blue, etc. backgrounds.
+   v1.6.3: Cluster-based mode detection (more robust than median when character
+   touches edges), 64 edge samples, higher default sensitivity. */
+function removeBackground(img, sensitivity = 40) {
   const canvas = document.createElement('canvas');
   const w = canvas.width = img.width || img.naturalWidth;
   const h = canvas.height = img.height || img.naturalHeight;
+  if (!w || !h) return canvas;
   const ctx = canvas.getContext('2d');
   ctx.drawImage(img, 0, 0);
   const imgData = ctx.getImageData(0, 0, w, h);
   const d = imgData.data;
   const total = w * h;
 
-  // ─── 1. Sample opaque edge pixels to detect background color ───
+  // ─── 1. Sample opaque edge pixels: 16 per side = 64 candidates ───
   const samples = [];
-  const tryCollect = (x, y) => {
-    if (x < 0 || y < 0 || x >= w || y >= h) return;
-    const i = (y * w + x) * 4;
-    if (d[i + 3] > 200) samples.push([d[i], d[i + 1], d[i + 2]]);
-  };
-  // 8 samples per edge → 32 candidates
-  for (let k = 0; k < 8; k++) {
-    const xx = Math.floor((w - 1) * k / 7);
-    const yy = Math.floor((h - 1) * k / 7);
-    tryCollect(xx, 0);
-    tryCollect(xx, h - 1);
-    tryCollect(0, yy);
-    tryCollect(w - 1, yy);
+  const sampleDepths = []; // 0 means edge sample, >0 means marched-in depth
+  for (let k = 0; k < 16; k++) {
+    const px = Math.floor((w - 1) * k / 15);
+    const py = Math.floor((h - 1) * k / 15);
+    const corners = [[px, 0], [px, h - 1], [0, py], [w - 1, py]];
+    for (const [x, y] of corners) {
+      const i = (y * w + x) * 4;
+      if (d[i + 3] > 200) { samples.push([d[i], d[i + 1], d[i + 2]]); sampleDepths.push(0); }
+    }
+  }
+  // ─── Fallback: if outer edge is transparent (stamp-style PNG with
+  // transparent margin + opaque frame inside), march inward from each
+  // edge to find the first opaque pixel. This catches the inner frame. ───
+  const marchedFlag = samples.length < 8;
+  const maxMarch = Math.floor(Math.min(w, h) * 0.45);
+  if (marchedFlag) {
+    for (let k = 0; k < 20; k++) {
+      const x = Math.floor((w - 1) * k / 19);
+      const y = Math.floor((h - 1) * k / 19);
+      // Top edge → down
+      for (let dy = 1; dy < maxMarch; dy++) {
+        const i = (dy * w + x) * 4;
+        if (d[i + 3] > 200) { samples.push([d[i], d[i + 1], d[i + 2]]); sampleDepths.push(dy); break; }
+      }
+      // Bottom edge → up
+      for (let dy = 1; dy < maxMarch; dy++) {
+        const i = ((h - 1 - dy) * w + x) * 4;
+        if (d[i + 3] > 200) { samples.push([d[i], d[i + 1], d[i + 2]]); sampleDepths.push(dy); break; }
+      }
+      // Left edge → right
+      for (let dx = 1; dx < maxMarch; dx++) {
+        const i = (y * w + dx) * 4;
+        if (d[i + 3] > 200) { samples.push([d[i], d[i + 1], d[i + 2]]); sampleDepths.push(dx); break; }
+      }
+      // Right edge → left
+      for (let dx = 1; dx < maxMarch; dx++) {
+        const i = (y * w + (w - 1 - dx)) * 4;
+        if (d[i + 3] > 200) { samples.push([d[i], d[i + 1], d[i + 2]]); sampleDepths.push(dx); break; }
+      }
+    }
   }
   if (samples.length === 0) {
-    // All edges already transparent — nothing to do
-    return canvas;
+    console.log('[배경 제거] 가장자리와 안쪽 모두 투명 → 처리할 배경 없음');
+    return canvas; // truly all transparent
   }
-  // Use median per channel for robustness against outliers (e.g., character touching edge)
-  const med = (arr, ch) => {
-    const sorted = arr.map(s => s[ch]).sort((a, b) => a - b);
-    return sorted[Math.floor(sorted.length / 2)];
-  };
-  const bgR = med(samples, 0);
-  const bgG = med(samples, 1);
-  const bgB = med(samples, 2);
 
-  // ─── 2. Flood fill from all edges, removing pixels within tolerance ───
+  // ─── 2. Cluster-based mode: find the densest color group ───
+  // Each sample's "score" = number of other samples within clusterRadius.
+  // Pick the cluster with the highest count and average its members.
+  const clusterRadius = 26;
+  let bestCount = -1;
+  let bgR = samples[0][0], bgG = samples[0][1], bgB = samples[0][2];
+  let bestClusterIdx = 0;
+  for (let i = 0; i < samples.length; i++) {
+    const [r, g, b] = samples[i];
+    let cnt = 0, sR = 0, sG = 0, sB = 0;
+    for (let j = 0; j < samples.length; j++) {
+      const [r2, g2, b2] = samples[j];
+      if (Math.abs(r - r2) <= clusterRadius &&
+          Math.abs(g - g2) <= clusterRadius &&
+          Math.abs(b - b2) <= clusterRadius) {
+        cnt++;
+        sR += r2; sG += g2; sB += b2;
+      }
+    }
+    if (cnt > bestCount) {
+      bestCount = cnt;
+      bgR = sR / cnt; bgG = sG / cnt; bgB = sB / cnt;
+      bestClusterIdx = i;
+    }
+  }
+
+  // ─── Safety check for march-inward case ───
+  // If we relied on marching, ensure the detected "background" is genuinely
+  // near the edges (a thin frame), not the outer layer of a centered character.
+  // Compute the average march depth of samples in the dominant cluster.
+  if (marchedFlag) {
+    let totalDepth = 0, depthCount = 0;
+    for (let j = 0; j < samples.length; j++) {
+      const [r, g, b] = samples[j];
+      if (Math.abs(r - bgR) <= clusterRadius &&
+          Math.abs(g - bgG) <= clusterRadius &&
+          Math.abs(b - bgB) <= clusterRadius) {
+        totalDepth += sampleDepths[j];
+        depthCount++;
+      }
+    }
+    const avgDepth = depthCount > 0 ? totalDepth / depthCount : 0;
+    // Reject if avg depth exceeds 25% of march range — likely a centered
+    // object (character with transparent margin) rather than a frame.
+    if (avgDepth > maxMarch * 0.25) {
+      console.log(`[배경 제거] 검출 색이 가장자리에서 너무 멀어 (avg ${avgDepth.toFixed(0)}px > ${(maxMarch*0.25).toFixed(0)}px) — 캐릭터로 판정, 처리 보류`);
+      return canvas;
+    }
+    console.log(`[배경 제거] march-inward 사용 · 검출 색 RGB(${Math.round(bgR)}, ${Math.round(bgG)}, ${Math.round(bgB)}) · 평균 깊이 ${avgDepth.toFixed(0)}px · 민감도 ${sensitivity}`);
+  } else {
+    console.log(`[배경 제거] 가장자리 직접 검출 · 색 RGB(${Math.round(bgR)}, ${Math.round(bgG)}, ${Math.round(bgB)}) · 민감도 ${sensitivity}`);
+  }
+
+  // Count pixels for diagnostic
+  let removedCount = 0;
+
+  // ─── 3. Flood fill from all edges, removing pixels within tolerance ───
   const visited = new Uint8Array(total);
   const stack = [];
   for (let x = 0; x < w; x++) { stack.push(x); stack.push((h - 1) * w + x); }
@@ -1912,19 +2086,21 @@ function removeBackground(img, sensitivity = 30) {
       if (idx < total - w) stack.push(idx + w);
       continue;
     }
-    // Color distance to detected background
+    // Color distance to detected background (Chebyshev = strictest channel)
     const dr = Math.abs(d[i] - bgR);
     const dg = Math.abs(d[i + 1] - bgG);
     const db = Math.abs(d[i + 2] - bgB);
-    const dist = Math.max(dr, dg, db); // Chebyshev distance — strictest channel
-    if (dist > sensitivity) continue; // outside tolerance → keep
-    // Within tolerance → make transparent (soft edge near boundary)
-    if (dist < sensitivity * 0.6) {
+    const dist = Math.max(dr, dg, db);
+    if (dist > sensitivity) continue; // outside tolerance → foreground, stop
+    // Within tolerance → make transparent (feather near boundary)
+    if (dist < sensitivity * 0.65) {
       d[i + 3] = 0;
+      removedCount++;
     } else {
-      // Feather: partial transparency for pixels at the edge of tolerance
-      const factor = (dist - sensitivity * 0.6) / (sensitivity * 0.4);
+      // Feather: pixels closer to the threshold keep more opacity
+      const factor = (dist - sensitivity * 0.65) / (sensitivity * 0.35);
       d[i + 3] = Math.round(d[i + 3] * factor);
+      removedCount++;
     }
     const x = idx % w;
     if (x > 0) stack.push(idx - 1);
@@ -1934,6 +2110,11 @@ function removeBackground(img, sensitivity = 30) {
   }
 
   ctx.putImageData(imgData, 0, 0);
+  const pctRemoved = (removedCount / total * 100).toFixed(1);
+  console.log(`[배경 제거] 완료 · ${removedCount.toLocaleString()}/${total.toLocaleString()} 픽셀 처리 (${pctRemoved}%)`);
+  if (removedCount === 0) {
+    console.warn('[배경 제거] 변경된 픽셀 없음 — 민감도를 높여보세요 (현재 ' + sensitivity + ')');
+  }
   return canvas;
 }
 
@@ -1973,7 +2154,7 @@ function getEffectiveImg(sourceIdx) {
   const src = state.sources[sourceIdx];
   if (!src) return null;
   if (!src.bgRemove) return src.img;
-  const sensitivity = src.bgSensitivity != null ? src.bgSensitivity : 30;
+  const sensitivity = src.bgSensitivity != null ? src.bgSensitivity : 40;
   if (!src._bgCache || src._bgCache.sensitivity !== sensitivity) {
     src._bgCache = { canvas: removeBackground(src.img, sensitivity), sensitivity };
   }
@@ -2241,13 +2422,14 @@ function renderSources() {
   grid.innerHTML = '';
   state.sources.forEach((s, i) => {
     const t = document.createElement('div');
-    t.className = 'src-thumb';
+    t.className = 'src-thumb' + (s.bgRemove ? ' bg-on' : '');
     t.innerHTML = `
       <img src="${s.dataUrl}" alt="${s.name}">
       <span class="idx">${String(i + 1).padStart(2, '0')}</span>
+      ${s.bgRemove ? '<span class="bg-badge" title="배경 제거 적용 중">✕BG</span>' : ''}
       <button class="del" onclick="event.stopPropagation();removeSource('${s.id}')">×</button>
     `;
-    t.title = s.name;
+    t.title = s.name + (s.bgRemove ? ` · 배경 제거 적용 (민감도 ${s.bgSensitivity ?? 40})` : '');
     grid.appendChild(t);
   });
 }
@@ -2754,7 +2936,7 @@ function buildTransformBarHTML(platform, sel, t) {
           <span class="tb-glabel">배경 제거 <span class="tb-val tb-sens-val" style="display:${bgOn?'inline':'none'}">민감도 ${sens}</span></span>
           <div class="tb-row">
             <div class="tb-btns tb-bg">
-              <button class="${bgOn?'on':''}" onclick="toggleBgRemove('${platform}')" title="배경색을 자동 감지해 투명화">${bgOn?'✓ 적용':'배경 투명화'}</button>
+              <button class="${bgOn?'on':''}" onclick="toggleBgRemove('${platform}')" title="배경색을 자동 감지해 제거">${bgOn?'✓ 적용':'배경 제거'}</button>
             </div>
             <input type="range" min="10" max="80" value="${sens}" class="tb-sens-input"
                    style="display:${bgOn?'inline-block':'none'};width:80px"
@@ -2847,7 +3029,7 @@ function syncTransformBar(bar, platform, sel, t) {
     const bgBtn = bar.querySelector('.tb-bg button');
     if (bgBtn) {
       bgBtn.classList.toggle('on', on);
-      bgBtn.textContent = on ? '✓ 적용' : '배경 투명화';
+      bgBtn.textContent = on ? '✓ 적용' : '배경 제거';
     }
     const sensInput = bar.querySelector('.tb-sens-input');
     if (sensInput) {
@@ -2879,7 +3061,7 @@ function applyBgRemoveToAll(platform) {
     s._bgCache = null;
   });
   renderPlatform(platform);
-  toast(`${state.sources.length}개 이미지에 배경 투명화 적용됨`);
+  toast(`${state.sources.length}개 이미지에 배경 제거 적용됨`);
 }
 
 function clearBgRemoveAll(platform) {
@@ -2888,7 +3070,44 @@ function clearBgRemoveAll(platform) {
     s._bgCache = null;
   });
   renderPlatform(platform);
-  toast('배경 투명화 전체 해제');
+  toast('배경 제거 전체 해제');
+}
+
+/* Global (sidebar) variants - apply across ALL platforms, refresh everything */
+function applyBgRemoveToAllGlobal() {
+  if (state.sources.length === 0) { toast('PNG 파일을 먼저 업로드해 주세요', true); return; }
+  const sens = parseInt(document.getElementById('bg-global-sens').value) || 40;
+  state.sources.forEach(s => {
+    s.bgRemove = true;
+    s.bgSensitivity = sens;
+    s._bgCache = null;
+  });
+  renderAll();
+  toast(`${state.sources.length}개 이미지에 배경 제거 적용 (민감도 ${sens})`);
+}
+
+function clearBgRemoveAllGlobal() {
+  if (state.sources.length === 0) return;
+  state.sources.forEach(s => {
+    s.bgRemove = false;
+    s._bgCache = null;
+  });
+  renderAll();
+  toast('배경 제거 전체 해제');
+}
+
+function updateGlobalBgSensitivity(val) {
+  document.getElementById('bg-global-sens-val').textContent = val;
+  // Live-update only if any source already has bgRemove on
+  const anyOn = state.sources.some(s => s.bgRemove);
+  if (!anyOn) return;
+  state.sources.forEach(s => {
+    if (s.bgRemove) {
+      s.bgSensitivity = val;
+      s._bgCache = null;
+    }
+  });
+  renderAll();
 }
 
 /* =========================================================
