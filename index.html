@@ -1,13 +1,3522 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>arte-lighting</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이모티콘 리사이즈 · Kakao / Line / OGQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Sans+Thai:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+  :root {
+    --bg: #ededeb;
+    --surface: #ffffff;
+    --card: #ffffff;
+    --card-2: #f4f2ed;
+    --card-3: #e8e5df;
+    --border: #ddd9d2;
+    --border-strong: #b3afa6;
+    --ink: #1a1612;
+    --ink-2: #57534b;
+    --ink-3: #8a8580;
+    --accent: #c2410c;
+    --accent-warm: #ea580c;
+    --danger: #dc2626;
+    --success: #65a30d;
+    --info: #2563eb;
+    --check-1: #ffffff;
+    --check-2: #e5e2dc;
+
+    --font-display: 'Gowun Batang', 'Noto Serif KR', serif;
+    --font-body: 'Noto Sans KR', 'Noto Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(217, 119, 6, 0.06), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 90% 100%, rgba(220, 38, 38, 0.04), transparent 60%);
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--card-3); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+  /* ===== HEADER ===== */
+  header {
+    padding: 32px 48px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .credits-bar {
+    padding: 8px 48px;
+    background: var(--card-2);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    display: flex;
+    gap: 8px 14px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    line-height: 1.5;
+  }
+  .credits-bar strong {
+    color: var(--ink-2);
+    font-weight: 700;
+    margin-left: 4px;
+  }
+  .credits-bar a {
+    color: var(--accent);
+    text-decoration: none;
+    margin-left: 4px;
+  }
+  .credits-bar a:hover { text-decoration: underline; }
+  .credits-bar .sep { color: var(--border-strong); }
+  .credits-notice {
+    font-family: var(--font-body);
+    font-size: 9px;
+    letter-spacing: 0;
+    line-height: 1.55;
+    color: var(--ink-3);
+    opacity: 0.85;
+    flex: 1;
+    min-width: 220px;
+  }
+  .credits-notice strong {
+    color: var(--accent);
+    font-weight: 700;
+    margin: 0;
+  }
+  @media (max-width: 640px) {
+    .credits-bar { padding: 8px 20px; }
+    .credits-notice { min-width: 100%; }
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--accent);
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--accent);
+    transform: rotate(-3deg);
+    flex-shrink: 0;
+  }
+  h1.brand-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .brand-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+  .meta-block { display: flex; flex-direction: column; align-items: flex-end; }
+  .meta-block strong {
+    font-family: var(--font-mono);
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .meta-block span { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* ===== LAYOUT ===== */
+  main {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 100px);
+  }
+  @media (max-width: 1024px) {
+    main { grid-template-columns: 1fr; }
+    header { padding: 24px; }
+  }
+
+  /* ===== SIDEBAR ===== */
+  aside {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  @media (max-width: 1024px) {
+    aside { position: relative; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .section-label::before {
+    content: '';
+    width: 12px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .dropzone {
+    border: 2px dashed var(--border-strong);
+    border-radius: 6px;
+    padding: 28px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--card);
+  }
+  .dropzone:hover, .dropzone.drag {
+    border-color: var(--accent);
+    background: rgba(251, 191, 36, 0.04);
+  }
+  .dropzone-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+  .dropzone-hint {
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .dropzone input { display: none; }
+
+  .source-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .source-counter .count {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .source-counter .total { color: var(--ink-3); }
+  .source-counter button.clear {
+    background: none;
+    border: 1px solid var(--border-strong);
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  .source-counter button.clear:hover { color: var(--danger); border-color: var(--danger); }
+
+  .sources-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .src-thumb {
+    position: relative;
+    aspect-ratio: 1;
+    background:
+      conic-gradient(from 45deg at 50% 50%, var(--check-2) 0% 25%, var(--check-1) 25% 50%, var(--check-2) 50% 75%, var(--check-1) 75% 100%);
+    background-size: 16px 16px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .src-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .src-thumb:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .src-thumb .idx {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--ink);
+    background: rgba(255,255,255,0.85);
+    padding: 1px 4px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+  }
+  .src-thumb .del {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--danger);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 10px;
+    line-height: 1;
+    display: none;
+    padding: 0;
+  }
+  .src-thumb:hover .del { display: block; }
+
+  .quick-tips {
+    background: var(--card);
+    border-left: 2px solid var(--accent);
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+  .quick-tips strong { color: var(--ink); }
+
+  /* ===== CONTENT ===== */
+  .content {
+    padding: 24px 32px 100px;
+  }
+
+  /* Platform tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  .tab {
+    background: none;
+    border: none;
+    color: var(--ink-3);
+    padding: 16px 24px;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 18px;
+    position: relative;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tab .tab-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    background: var(--card-2);
+    padding: 2px 7px;
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--ink); }
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .tab.active .tab-num { background: var(--accent); color: #fff; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Panel header */
+  .panel-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .panel-title {
+    font-family: var(--font-display);
+    font-size: 30px;
+    margin: 0 0 6px;
+    line-height: 1;
+  }
+  .panel-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .panel-sub {
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    max-width: 540px;
+  }
+  .spec-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .pill {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    background: var(--card-2);
+    color: var(--ink-2);
+    padding: 4px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    letter-spacing: 0.05em;
+  }
+
+  /* Controls */
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .ctrl { display: flex; flex-direction: column; gap: 6px; }
+  .ctrl-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-3);
+  }
+  .ctrl select, .ctrl input[type="text"], .ctrl input[type="number"] {
+    background: var(--card-2);
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 14px;
+  }
+  .ctrl select:focus, .ctrl input:focus { outline: none; border-color: var(--accent); }
+
+  .seg {
+    display: inline-flex;
+    background: var(--card-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    padding: 2px;
+    gap: 0;
+  }
+  .seg button {
+    background: none;
+    border: none;
+    color: var(--ink-2);
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .seg button.on {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .slider-row input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+  }
+  .slider-val {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  .ctrl input[type="color"] {
+    width: 100%;
+    height: 36px;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    background: var(--card-2);
+    cursor: pointer;
+  }
+
+  /* Preview area */
+  .preview-area {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 1280px) { .preview-area { grid-template-columns: 1fr; } }
+
+  .preview-side {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+  }
+  .preview-side h3 {
+    font-family: var(--font-display);
+    font-size: 16px;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+  .main-tab-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .slot {
+    background: var(--card-2);
+    border: 1px solid var(--border);
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .slot .slot-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+  .slot .slot-img {
+    background:
+      conic-gradient(from 45deg at 50% 50%, var(--check-2) 0% 25%, var(--check-1) 25% 50%, var(--check-2) 50% 75%, var(--check-1) 75% 100%);
+    background-size: 12px 12px;
+    aspect-ratio: 1;
+    margin-bottom: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+  .slot .slot-img img, .slot .slot-img canvas { max-width: 100%; max-height: 100%; }
+  .slot select {
+    background: var(--card);
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    font-size: 11px;
+    padding: 4px;
+    border-radius: 3px;
+    width: 100%;
+    font-family: var(--font-mono);
+  }
+  .slot .slot-spec {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--ink-3);
+    margin-top: 4px;
+  }
+
+  /* Sticker preview grid */
+  .preview-main {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    min-height: 400px;
+  }
+  .preview-main-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .preview-main-head h3 {
+    font-family: var(--font-display);
+    font-size: 16px;
+    margin: 0;
+  }
+  .preview-mode-btn {
+    background: var(--card-2);
+    border: 1px solid var(--border-strong);
+    color: var(--ink-2);
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+  .preview-mode-btn.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .sticker-cell {
+    aspect-ratio: 1;
+    background:
+      conic-gradient(from 45deg at 50% 50%, var(--check-2) 0% 25%, var(--check-1) 25% 50%, var(--check-2) 50% 75%, var(--check-1) 75% 100%);
+    background-size: 12px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .sticker-cell.dark,
+  .sticker-grid.dark .sticker-cell,
+  .lang-grid.dark .lang-preview {
+    background: #1a1a1a !important;
+    background-image: none !important;
+  }
+  .sticker-cell.dark .num,
+  .sticker-grid.dark .sticker-cell .num {
+    color: #fff;
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  /* Selected sticker cell */
+  .sticker-cell.selected {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.18);
+  }
+  .sticker-cell { cursor: pointer; }
+
+  /* Selectable main/tab slots */
+  .slot.clickable {
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .slot.clickable:hover { border-color: var(--accent); }
+  .slot.selected {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.15);
+  }
+  .slot.selected .slot-label {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Transform toolbar */
+  .tbar {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, #fff7ed, #fff);
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .tbar.show { display: flex; }
+  .tb-info {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px dashed var(--border-strong);
+    padding-right: 14px;
+    margin-right: 4px;
+  }
+  .tb-info span {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .tb-info strong {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--accent);
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .tb-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .tb-group .tb-glabel {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+  }
+  .tb-row {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .tb-row input[type="range"] {
+    width: 110px;
+    accent-color: var(--accent);
+  }
+  .tb-row .tb-val {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink);
+    min-width: 38px;
+  }
+  .tb-btns {
+    display: flex;
+    gap: 2px;
+  }
+  .tb-btns button {
+    background: #fff;
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    padding: 5px 9px;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 3px;
+    min-width: 28px;
+    line-height: 1;
+    font-family: var(--font-mono);
+  }
+  .tb-btns button:hover { background: var(--card-2); }
+  .tb-btns button.on {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .tb-nudge {
+    display: flex;
+    gap: 2px;
+  }
+  .tb-nudge button {
+    background: #fff;
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 11px;
+    padding: 0;
+    line-height: 1;
+    font-family: var(--font-mono);
+    width: 26px;
+    height: 24px;
+  }
+  .tb-nudge button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tb-spacer { flex: 1; }
+  .tb-actions { display: flex; gap: 6px; }
+  .tb-actions button {
+    background: #fff;
+    border: 1px solid var(--border-strong);
+    color: var(--ink-2);
+    padding: 6px 12px;
+    border-radius: 3px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .tb-actions .tb-reset:hover { background: var(--card-3); }
+  .tb-actions .tb-close:hover { color: var(--danger); border-color: var(--danger); }
+  .tb-actions .tb-close { font-size: 14px; padding: 4px 9px; }
+  .sticker-cell img, .sticker-cell canvas {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+  }
+  .sticker-cell .num {
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--ink);
+    background: rgba(255,255,255,0.85);
+    padding: 1px 4px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+  }
+  .empty-state {
+    color: var(--ink-3);
+    text-align: center;
+    padding: 60px 20px;
+    font-style: italic;
+  }
+
+  /* ===== LINE LANGUAGE EDITOR ===== */
+  .lang-editor {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-top: 20px;
+    overflow: hidden;
+  }
+  .lang-editor-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--card-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .lang-editor-head h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .lang-editor-head h3 small {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 400;
+  }
+  .lang-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .lang-nav button {
+    background: var(--card-3);
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    width: 28px;
+    height: 28px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .lang-nav span {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-2);
+    min-width: 80px;
+    text-align: center;
+  }
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+  }
+  .lang-cell {
+    padding: 14px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .lang-cell:last-child { border-right: none; }
+  .lang-cell-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .lang-name {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+  }
+  .lang-flag {
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .lang-preview {
+    aspect-ratio: 370/320;
+    background:
+      conic-gradient(from 45deg at 50% 50%, var(--check-2) 0% 25%, var(--check-1) 25% 50%, var(--check-2) 50% 75%, var(--check-1) 75% 100%);
+    background-size: 10px 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    cursor: grab;
+    position: relative;
+    user-select: none;
+  }
+  .lang-preview:active { cursor: grabbing; }
+  .lang-preview.dragging { cursor: grabbing; border-color: var(--accent); }
+  .lang-preview::after {
+    content: '드래그로 텍스트 이동';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    color: var(--ink-3);
+    background: rgba(255, 255, 255, 0.85);
+    padding: 2px 6px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .lang-preview:hover::after { opacity: 1; }
+  .lang-grid.dark .lang-preview::after {
+    background: rgba(20, 18, 16, 0.85);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .lang-preview canvas, .lang-preview img { max-width: 100%; max-height: 100%; pointer-events: none; }
+  .lang-cell textarea {
+    background: var(--card-2);
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    padding: 8px;
+    border-radius: 3px;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 50px;
+    font-family: var(--font-body);
+  }
+  .lang-cell textarea:focus { outline: none; border-color: var(--accent); }
+  @media (max-width: 1280px) {
+    .lang-grid { grid-template-columns: repeat(2, 1fr); }
+    .lang-cell:nth-child(2) { border-right: none; }
+    .lang-cell { border-bottom: 1px solid var(--border); }
+  }
+
+  /* ===== EXPORT BAR ===== */
+  .export-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border-strong);
+    padding: 14px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    z-index: 50;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 -2px 20px rgba(0,0,0,0.04);
+  }
+  .export-summary {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+  }
+  .export-summary .stat {
+    display: flex;
+    flex-direction: column;
+  }
+  .export-summary .stat strong {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .export-summary .stat span {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-top: 4px;
+  }
+  .export-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    background: var(--card-2);
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    padding: 9px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: var(--card-3); border-color: var(--ink-3); }
+  .btn.primary {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+    font-weight: 700;
+  }
+  .btn.primary:hover { background: #000; border-color: #000; }
+  .btn.ghost { background: transparent; }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .btn .tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    background: rgba(0,0,0,0.06);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .btn.primary .tag { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    color: #fff;
+    padding: 14px 18px;
+    border-radius: 4px;
+    z-index: 1000;
+    max-width: 340px;
+    font-size: 13px;
+    line-height: 1.5;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+  .toast.show { transform: translateX(0); }
+  .toast.error { background: var(--danger); border-color: var(--danger); }
+
+  /* Help section */
+  details.help {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-top: 24px;
+    padding: 0;
+  }
+  details.help summary {
+    cursor: pointer;
+    padding: 14px 20px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: var(--ink-2);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  details.help summary::after {
+    content: '+';
+    font-family: var(--font-mono);
+    color: var(--accent);
+    font-size: 20px;
+  }
+  details.help[open] summary::after { content: '−'; }
+  details.help .help-body {
+    padding: 0 20px 20px;
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.7;
+  }
+  details.help .help-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+  details.help .help-body th, details.help .help-body td {
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  details.help .help-body th {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+  details.help .help-body code {
+    font-family: var(--font-mono);
+    background: var(--card-2);
+    padding: 1px 5px;
+    border-radius: 2px;
+    color: var(--accent);
+    font-size: 11px;
+  }
+
+  /* Resize panel */
+  .resize-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 24px;
+  }
+  .resize-panel h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    margin: 0 0 4px;
+  }
+  .resize-panel p {
+    color: var(--ink-2);
+    font-size: 12px;
+    margin: 0 0 16px;
+  }
+  .resize-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .resize-option {
+    background: var(--card-2);
+    border: 1px solid var(--border-strong);
+    padding: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .resize-option:hover { border-color: var(--accent); background: var(--card-3); }
+  .resize-option h4 {
+    margin: 0 0 4px;
+    font-family: var(--font-display);
+    font-size: 14px;
+  }
+  .resize-option .dim {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+  }
+  .resize-option .desc {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 4px;
+  }
+
+  /* progress overlay */
+  .progress-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(237, 237, 235, 0.85);
+    backdrop-filter: blur(6px);
+    display: none;
+    place-items: center;
+    z-index: 2000;
+  }
+  .progress-overlay.show { display: grid; }
+  .progress-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 32px 40px;
+    border-radius: 6px;
+    text-align: center;
+    max-width: 360px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  }
+  .progress-box h3 {
+    font-family: var(--font-display);
+    margin: 0 0 8px;
+  }
+  .progress-box p {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.1em;
+    margin: 0 0 16px;
+  }
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--card-2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-bar > div {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.2s;
+  }
+</style>
+</head>
+<body>
+
+<div class="credits-bar">
+  <span>제작<strong>YOPY</strong></span>
+  <span class="sep">·</span>
+  <span>문의<a href="mailto:pina@naver.com">pina@naver.com</a></span>
+  <span class="credits-notice">* 이 웹페이지는 이모티콘을 작업하다 귀차니즘으로 인해 만들게 되었고, 아직 베타테스트 중으로 크고 작은 오류가 있을 수 있습니다. <strong>라인 번역작업을 할 때엔 오류가 있을 수 있으므로 꼭 한 번 더 확인해 주세요.</strong> 제작자가 바이브코딩러라 수정이 어려울 수도 있음을 미리 안내드립니다. 첫 제작일은 2026.05.11이며, 우측상단 날짜는 최근 수정일임을 안내드립니다.</span>
+</div>
+
+<header>
+  <div class="brand">
+    <div>
+      <h1 class="brand-title">이모티콘 리사이즈</h1>
+      <div class="brand-sub">Kakao · Line · OGQ · ALL-IN-ONE WORKSPACE</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="meta-block"><strong id="ver">v1.0</strong><span>Version</span></div>
+    <div class="meta-block"><strong id="proj-date">—</strong><span>Project Date</span></div>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <div>
+      <div class="section-label">01 · Upload</div>
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-title">PNG 파일 끌어놓기</div>
+        <div class="dropzone-hint">또는 클릭해서 선택<br/>투명 배경 PNG 권장 · 다중 선택 가능</div>
+        <input type="file" id="file-input" multiple accept="image/png">
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">02 · Sources</div>
+      <div class="source-counter">
+        <span><span class="count" id="src-count">0</span><span class="total"> / 40</span></span>
+        <button class="clear" onclick="clearSources()">전체삭제</button>
+      </div>
+      <div class="sources-grid" id="sources-grid"></div>
+    </div>
+
+    <div class="quick-tips">
+      <strong>워크플로우</strong><br/>
+      ① PNG 업로드 → ② 메인·탭 지정 → ③ 플랫폼별 옵션 설정 → ④ 미리보기 확인 → ⑤ ZIP·PDF 출력
+    </div>
+
+    <div class="quick-tips" style="border-left-color: var(--info)">
+      <strong>개별 편집</strong><br/>
+      스티커를 <strong>클릭</strong>하면 그 이미지만 크기·정렬·위치를 미세조정할 수 있어요. 박스 안 여백을 셀별로 다르게 잡고 싶을 때 사용하세요.
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="tabs">
+      <button class="tab active" data-tab="kakao"><span class="tab-num">01</span>카카오</button>
+      <button class="tab" data-tab="line"><span class="tab-num">02</span>라인</button>
+      <button class="tab" data-tab="ogq"><span class="tab-num">03</span>OGQ</button>
+      <button class="tab" data-tab="resize"><span class="tab-num">04</span>리사이즈</button>
+    </div>
+
+    <!-- ============ KAKAO PANEL ============ -->
+    <section class="panel active" id="panel-kakao">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">카카오 <em>이모티콘</em></h2>
+          <p class="panel-sub">카카오 이모티콘 스튜디오 제안용. 멈춰있는·움직이는·큰 이모티콘 3가지 타입을 지원합니다. 투명 배경 PNG 자동 처리.</p>
+        </div>
+        <div class="spec-pills" id="kakao-pills"></div>
+      </div>
+
+      <div class="controls">
+        <div class="ctrl">
+          <span class="ctrl-label">이모티콘 타입</span>
+          <div class="seg" id="kakao-type-seg">
+            <button data-val="static" class="on">멈춤 (32)</button>
+            <button data-val="animated">움직임 (24)</button>
+            <button data-val="big">큰 이모티콘 (16)</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">이미지 맞춤</span>
+          <div class="seg" id="kakao-fit-seg">
+            <button data-val="contain" class="on">여백</button>
+            <button data-val="cover">꽉채움</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">박스 안 크기 <span class="slider-val" id="kakao-scale-val">100%</span></span>
+          <div class="slider-row">
+            <input type="range" id="kakao-scale" min="50" max="150" value="100">
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">해상도</span>
+          <select id="kakao-res">
+            <option value="default">기본 (타입에 따라 자동)</option>
+            <option value="2x">2× 마스터 사이즈</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">파일명 규칙</span>
+          <select id="kakao-naming">
+            <option value="zero">01.png, 02.png …</option>
+            <option value="plain">1.png, 2.png …</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="preview-area">
+        <div class="preview-side">
+          <h3>메인 · 탭 이미지</h3>
+          <div class="main-tab-row" id="kakao-mt"></div>
+          <div style="font-size:11px;color:var(--ink-3);line-height:1.5;font-family:var(--font-mono)">
+            소스 이미지에서 자동 리사이즈됩니다.
+          </div>
+        </div>
+        <div class="preview-main">
+          <div class="preview-main-head">
+            <h3>스티커 미리보기 <span style="font-family:var(--font-mono);font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em;margin-left:8px" id="kakao-info">— 종</span></h3>
+            <button class="preview-mode-btn" onclick="toggleDark('kakao')">DARK</button>
+          </div>
+          <div class="tbar" id="kakao-tbar"></div>
+          <div class="sticker-grid" id="kakao-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LINE PANEL ============ -->
+    <section class="panel" id="panel-line">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">라인 <em>크리에이터스</em></h2>
+          <p class="panel-sub">LINE Creators Market 제출 규격. 5개 언어(한·일·영·중번체·태) 텍스트를 한 눈에 작업할 수 있습니다. 노토산스 폰트 기본 적용.</p>
+        </div>
+        <div class="spec-pills">
+          <span class="pill">스티커 최대 370×320</span>
+          <span class="pill">메인 240×240</span>
+          <span class="pill">탭 96×74</span>
+          <span class="pill">PNG · RGB · 72dpi</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="ctrl">
+          <span class="ctrl-label">스티커 개수</span>
+          <select id="line-count">
+            <option value="8">8종</option>
+            <option value="16">16종</option>
+            <option value="24" selected>24종</option>
+            <option value="32">32종</option>
+            <option value="40">40종</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">이미지 맞춤</span>
+          <div class="seg" id="line-fit-seg">
+            <button data-val="contain" class="on">여백</button>
+            <button data-val="cover">꽉채움</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">박스 안 크기 <span class="slider-val" id="line-scale-val">100%</span></span>
+          <div class="slider-row">
+            <input type="range" id="line-scale" min="50" max="150" value="100">
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">텍스트 위치 <span style="font-family:var(--font-mono);font-size:9px;color:var(--ink-3);letter-spacing:0.05em">또는 미리보기 드래그</span></span>
+          <div class="seg" id="line-pos-seg">
+            <button data-val="top">상단</button>
+            <button data-val="center">중앙</button>
+            <button data-val="bottom" class="on">하단</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">텍스트 가로 정렬</span>
+          <div class="seg" id="line-h-seg">
+            <button data-val="left">좌</button>
+            <button data-val="center" class="on">중앙</button>
+            <button data-val="right">우</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">가로 미세조정 <span class="slider-val" id="line-offset-x-val">0%</span></span>
+          <div class="slider-row">
+            <input type="range" id="line-offset-x" min="-50" max="50" value="0">
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">세로 미세조정 <span class="slider-val" id="line-offset-y-val">0%</span></span>
+          <div class="slider-row">
+            <input type="range" id="line-offset-y" min="-50" max="50" value="0">
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">텍스트 크기 <span class="slider-val" id="line-size-val">36px</span></span>
+          <div class="slider-row">
+            <input type="range" id="line-size" min="14" max="80" value="36">
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">텍스트 색상</span>
+          <input type="color" id="line-color" value="#000000">
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">텍스트 외곽선</span>
+          <input type="color" id="line-stroke-color" value="#ffffff">
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">외곽선 두께 <span class="slider-val" id="line-stroke-val">4px</span></span>
+          <div class="slider-row">
+            <input type="range" id="line-stroke" min="0" max="20" value="4">
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">폰트 두께</span>
+          <select id="line-weight">
+            <option value="400">Regular</option>
+            <option value="500">Medium</option>
+            <option value="700" selected>Bold</option>
+            <option value="900">Black</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">언어별 출력</span>
+          <div class="seg" id="line-export-seg">
+            <button data-val="bundle" class="on">5개언어 통합</button>
+            <button data-val="single">현재 언어만</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-area">
+        <div class="preview-side">
+          <h3>메인 · 탭 이미지</h3>
+          <div class="main-tab-row" id="line-mt"></div>
+        </div>
+        <div class="preview-main">
+          <div class="preview-main-head">
+            <h3>스티커 그리드 <span style="font-family:var(--font-mono);font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em;margin-left:8px" id="line-info">—</span></h3>
+            <button class="preview-mode-btn" onclick="toggleDark('line')">DARK</button>
+          </div>
+          <div class="tbar" id="line-tbar"></div>
+          <div class="sticker-grid" id="line-grid"></div>
+        </div>
+      </div>
+
+      <div class="lang-editor">
+        <div class="lang-editor-head">
+          <h3>5개 언어 텍스트 에디터 <small>noto sans · live preview</small></h3>
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="preview-mode-btn" onclick="translateKoreanToAll()" style="background:var(--accent);color:#fff;border-color:var(--accent)" title="한국어를 다른 4개 언어로 자동 번역">🌐 한→번역</button>
+            <button class="preview-mode-btn" id="line-lang-dark-btn" onclick="toggleLangDark()">DARK</button>
+            <div class="lang-nav">
+              <button onclick="navLine(-1)">‹</button>
+              <span id="line-nav-label">스티커 1 / 24</span>
+              <button onclick="navLine(1)">›</button>
+            </div>
+          </div>
+        </div>
+        <div class="lang-grid" id="line-lang-grid"></div>
+      </div>
+    </section>
+
+    <!-- ============ OGQ PANEL ============ -->
+    <section class="panel" id="panel-ogq">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">OGQ <em>마켓</em></h2>
+          <p class="panel-sub">네이버 OGQ마켓 제출 규격. 다크모드 대응 흰색 테두리(라인)를 두께별로 조절하며 작업할 수 있습니다.</p>
+        </div>
+        <div class="spec-pills">
+          <span class="pill">스티커 740×640</span>
+          <span class="pill">메인 240×240</span>
+          <span class="pill">탭 96×74</span>
+          <span class="pill">24종 PNG</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="ctrl" style="grid-column: span 2">
+          <span class="ctrl-label">라인 두께 (다크모드 대응) <span class="slider-val" id="ogq-border-val">5px</span></span>
+          <div class="slider-row">
+            <input type="range" id="ogq-border" min="0" max="20" value="5">
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">라인 색상</span>
+          <input type="color" id="ogq-border-color" value="#ffffff">
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">라인 적용 대상</span>
+          <select id="ogq-border-target">
+            <option value="all">전체 스티커</option>
+            <option value="sticker">스티커만 (메인/탭 제외)</option>
+            <option value="none">미적용 (원본 그대로)</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">다중 두께 프리셋</span>
+          <div class="seg" id="ogq-preset-seg">
+            <button data-val="3">3px</button>
+            <button data-val="5" class="on">5px</button>
+            <button data-val="8">8px</button>
+            <button data-val="12">12px</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">이미지 맞춤</span>
+          <div class="seg" id="ogq-fit-seg">
+            <button data-val="contain" class="on">여백</button>
+            <button data-val="cover">꽉채움</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">박스 안 크기 <span class="slider-val" id="ogq-scale-val">100%</span></span>
+          <div class="slider-row">
+            <input type="range" id="ogq-scale" min="50" max="150" value="100">
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-area">
+        <div class="preview-side">
+          <h3>메인 · 탭 이미지</h3>
+          <div class="main-tab-row" id="ogq-mt"></div>
+          <div style="margin-top:14px;padding:10px;background:var(--card-2);border-radius:4px;font-size:11px;color:var(--ink-2);line-height:1.6">
+            <strong style="color:var(--accent)">TIP</strong> 어두운 캐릭터·글씨일수록 5–8px 라인 권장. 가독성 좋은 캐릭터는 0–3px도 통과 가능.
+          </div>
+          <div style="margin-top:10px;padding:12px;background:#fff7ed;border:1px solid var(--accent);border-radius:4px;font-size:12px;color:var(--ink);line-height:1.5">
+            <strong style="display:block;margin-bottom:6px">🎨 일괄 배경 투명화</strong>
+            <div style="color:var(--ink-2);margin-bottom:8px;font-size:11px">DARK 미리보기에서 흰·크림색 배경이 보이는 이미지가 있다면 한 번에 처리</div>
+            <button class="btn" style="width:100%;justify-content:center;background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600" onclick="applyBgRemoveToAll('ogq')">모든 이미지 배경 투명화</button>
+            <button class="btn ghost" style="width:100%;justify-content:center;margin-top:4px;font-size:11px;color:var(--ink-3)" onclick="clearBgRemoveAll('ogq')">전체 해제</button>
+          </div>
+        </div>
+        <div class="preview-main">
+          <div class="preview-main-head">
+            <h3>스티커 미리보기 <span style="font-family:var(--font-mono);font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em;margin-left:8px" id="ogq-info">— 종</span></h3>
+            <button class="preview-mode-btn" onclick="toggleDark('ogq')">DARK</button>
+          </div>
+          <div class="tbar" id="ogq-tbar"></div>
+          <div class="sticker-grid" id="ogq-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RESIZE PANEL ============ -->
+    <section class="panel" id="panel-resize">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">통합 <em>리사이즈</em></h2>
+          <p class="panel-sub">업로드한 PNG들을 카카오·라인·OGQ 규격에 맞춰 한 번에 리사이즈합니다. 비율 유지 + 투명 배경 보존.</p>
+        </div>
+      </div>
+
+      <div class="resize-panel">
+        <h3>플랫폼 프리셋</h3>
+        <p>선택한 규격으로 전체 소스 이미지를 일괄 리사이즈하고 ZIP으로 받습니다.</p>
+        <div class="resize-options">
+          <div class="resize-option" onclick="exportResize('kakao-static')">
+            <h4>카카오 · 멈춤</h4>
+            <div class="dim">360 × 360</div>
+            <div class="desc">멈춰있는 이모티콘</div>
+          </div>
+          <div class="resize-option" onclick="exportResize('kakao-animated')">
+            <h4>카카오 · 움직임</h4>
+            <div class="dim">360 × 360</div>
+            <div class="desc">움직이는 이모티콘 (정지컷)</div>
+          </div>
+          <div class="resize-option" onclick="exportResize('kakao-big')">
+            <h4>카카오 · 큰</h4>
+            <div class="dim">540 × 540</div>
+            <div class="desc">큰 이모티콘</div>
+          </div>
+          <div class="resize-option" onclick="exportResize('line-sticker')">
+            <h4>라인 · 스티커</h4>
+            <div class="dim">370 × 320</div>
+            <div class="desc">크리에이터스 마켓 정지스티커</div>
+          </div>
+          <div class="resize-option" onclick="exportResize('line-main')">
+            <h4>라인 · 메인</h4>
+            <div class="dim">240 × 240</div>
+            <div class="desc">메인 이미지</div>
+          </div>
+          <div class="resize-option" onclick="exportResize('line-tab')">
+            <h4>라인 · 탭</h4>
+            <div class="dim">96 × 74</div>
+            <div class="desc">채팅 썸네일 아이콘</div>
+          </div>
+          <div class="resize-option" onclick="exportResize('ogq-sticker')">
+            <h4>OGQ · 스티커</h4>
+            <div class="dim">740 × 640</div>
+            <div class="desc">네이버 OGQ마켓</div>
+          </div>
+          <div class="resize-option" onclick="exportResize('ogq-main')">
+            <h4>OGQ · 메인</h4>
+            <div class="dim">240 × 240</div>
+            <div class="desc">메인 이미지</div>
+          </div>
+          <div class="resize-option" onclick="exportResize('ogq-tab')">
+            <h4>OGQ · 탭</h4>
+            <div class="dim">96 × 74</div>
+            <div class="desc">탭 이미지</div>
+          </div>
+        </div>
+      </div>
+
+      <details class="help" open>
+        <summary>플랫폼별 출시 규격 한눈에 보기</summary>
+        <div class="help-body">
+          <table>
+            <thead><tr><th>플랫폼</th><th>유형</th><th>개수</th><th>스티커</th><th>메인</th><th>탭</th></tr></thead>
+            <tbody>
+              <tr><td>카카오</td><td>멈춤</td><td>32</td><td>360×360</td><td>—</td><td>—</td></tr>
+              <tr><td>카카오</td><td>움직임</td><td>24 <small>(21정지+3GIF)</small></td><td>360×360</td><td>—</td><td>—</td></tr>
+              <tr><td>카카오</td><td>큰</td><td>16</td><td>540×540</td><td>—</td><td>—</td></tr>
+              <tr><td>라인</td><td>정지</td><td>8/16/24/32/40</td><td>최대 370×320</td><td>240×240</td><td>96×74</td></tr>
+              <tr><td>OGQ</td><td>정지</td><td>24</td><td>740×640</td><td>240×240</td><td>96×74</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:14px">모든 파일은 <code>.png</code>, 투명 배경, RGB, 72dpi 권장. OGQ는 다크모드 대응 흰색 라인을 자동 추가할 수 있습니다.</p>
+        </div>
+      </details>
+
+      <details class="help">
+        <summary>파일명 규칙</summary>
+        <div class="help-body">
+          <p><strong>카카오:</strong> 자유 (스튜디오에서 슬롯에 개별 업로드)</p>
+          <p><strong>라인:</strong> <code>main.png</code> · <code>tab.png</code> · <code>01.png</code> ~ <code>NN.png</code> (2자리 숫자, ZIP 압축)</p>
+          <p><strong>OGQ:</strong> <code>main.png</code> · <code>tab.png</code> · <code>1.png</code> ~ <code>24.png</code></p>
+        </div>
+      </details>
+    </section>
+  </div>
+</main>
+
+<div class="export-bar">
+  <div class="export-summary">
+    <div class="stat"><strong id="stat-src">0</strong><span>Sources</span></div>
+    <div class="stat"><strong id="stat-out">0</strong><span>Outputs</span></div>
+    <div class="stat"><strong id="stat-platform">3</strong><span>Platforms</span></div>
+  </div>
+  <div class="export-actions">
+    <button class="btn ghost" onclick="exportPDF()">PDF 리포트</button>
+    <button class="btn" onclick="exportPlatform('kakao')">카카오 ZIP</button>
+    <button class="btn" onclick="exportPlatform('line')">라인 ZIP</button>
+    <button class="btn" onclick="exportPlatform('ogq')">OGQ ZIP</button>
+    <button class="btn primary" onclick="exportAll()">전체 ZIP <span class="tag">ALL</span></button>
+  </div>
+</div>
+
+<div class="progress-overlay" id="progress">
+  <div class="progress-box">
+    <h3 id="progress-title">출력 중…</h3>
+    <p id="progress-msg">이미지 처리하고 있어요</p>
+    <div class="progress-bar"><div id="progress-fill"></div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   STATE
+========================================================= */
+const SPEC = {
+  kakao: {
+    static:   { count: 32, w: 360, h: 360, label: '멈춰있는 32종 · 360×360' },
+    animated: { count: 24, w: 360, h: 360, label: '움직이는 24종 · 360×360 (정지컷)' },
+    big:      { count: 16, w: 540, h: 540, label: '큰 이모티콘 16종 · 540×540' }
+  },
+  line:  { stickerW: 370, stickerH: 320, mainW: 240, mainH: 240, tabW: 96, tabH: 74 },
+  ogq:   { stickerW: 740, stickerH: 640, mainW: 240, mainH: 240, tabW: 96, tabH: 74 }
+};
+
+const LANGS = [
+  { code: 'kr', name: 'KOREAN',  flag: '한국어', font: '"Noto Sans KR"', sample: '안녕하세요' },
+  { code: 'jp', name: 'JAPANESE', flag: '日本語',  font: '"Noto Sans JP"', sample: 'こんにちは' },
+  { code: 'en', name: 'ENGLISH',  flag: 'English', font: '"Noto Sans"',   sample: 'Hello' },
+  { code: 'tw', name: 'CHINESE',  flag: '繁體中文', font: '"Noto Sans TC"', sample: '你好' },
+  { code: 'th', name: 'THAI',     flag: 'ภาษาไทย', font: '"Noto Sans Thai"', sample: 'สวัสดี' }
+];
+
+const state = {
+  sources: [],
+  kakao: {
+    type: 'static',
+    naming: 'zero',
+    res: 'default',
+    mainIdx: 0,
+    tabIdx: 0,
+    fit: 'contain',
+    scale: 100,
+    dark: false,
+    selected: null,
+    mainTransform: { scale: 100, alignH: 'center', alignV: 'center', offsetX: 0, offsetY: 0 },
+    tabTransform:  { scale: 100, alignH: 'center', alignV: 'center', offsetX: 0, offsetY: 0 }
+  },
+  line: {
+    count: 24,
+    mainIdx: 0,
+    tabIdx: 0,
+    position: 'bottom',
+    size: 36,
+    color: '#000000',
+    strokeColor: '#ffffff',
+    stroke: 4,
+    weight: '700',
+    exportMode: 'bundle',
+    activeSticker: 0,
+    texts: {},
+    fit: 'contain',
+    scale: 100,
+    dark: false,
+    langDark: false,
+    selected: null,
+    alignH: 'center',
+    offsetX: 0,
+    offsetY: 0,
+    mainTransform: { scale: 100, alignH: 'center', alignV: 'center', offsetX: 0, offsetY: 0 },
+    tabTransform:  { scale: 100, alignH: 'center', alignV: 'center', offsetX: 0, offsetY: 0 }
+  },
+  ogq: {
+    mainIdx: 0,
+    tabIdx: 0,
+    border: 5,
+    borderColor: '#ffffff',
+    borderTarget: 'all',
+    fit: 'contain',
+    scale: 100,
+    dark: false,
+    selected: null,
+    mainTransform: { scale: 100, alignH: 'center', alignV: 'center', offsetX: 0, offsetY: 0 },
+    tabTransform:  { scale: 100, alignH: 'center', alignV: 'center', offsetX: 0, offsetY: 0 }
+  }
+};
+
+// init project date
+document.getElementById('proj-date').textContent =
+  new Date().toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' }).replace(/\./g, '').replace(/ /g, '.').replace(/\.$/, '');
+
+/* =========================================================
+   UPLOAD
+========================================================= */
+const dz = document.getElementById('dropzone');
+const fi = document.getElementById('file-input');
+
+dz.addEventListener('click', () => fi.click());
+fi.addEventListener('change', e => handleFiles(e.target.files));
+
+['dragenter', 'dragover'].forEach(ev => {
+  dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); });
+});
+['dragleave', 'drop'].forEach(ev => {
+  dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); });
+});
+dz.addEventListener('drop', e => {
+  e.preventDefault();
+  handleFiles(e.dataTransfer.files);
+});
+
+async function handleFiles(files) {
+  const arr = Array.from(files).filter(f => /image\/(png|jpeg|webp)/.test(f.type));
+  let bgDetectedCount = 0;
+  const bgIndices = [];
+  for (const f of arr) {
+    const dataUrl = await readAsDataURL(f);
+    const img = await loadImage(dataUrl);
+    const hasBg = detectHasBackground(img);
+    if (hasBg) {
+      bgDetectedCount++;
+      bgIndices.push(state.sources.length);
+    }
+    state.sources.push({
+      id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+      name: f.name,
+      dataUrl,
+      img,
+      bgRemove: false,
+      bgSensitivity: 30
+    });
+  }
+  renderAll();
+  if (bgDetectedCount > 0) {
+    toast(`${arr.length}개 추가됨 · 배경이 있는 이미지 ${bgDetectedCount}개 감지 → OGQ 탭에서 "배경 투명화" 권장`);
+  } else {
+    toast(`${arr.length}개 이미지 추가됨 (총 ${state.sources.length}개)`);
+  }
+}
+
+function readAsDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+function loadImage(src) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = src;
+  });
+}
+
+function clearSources() {
+  if (!confirm('모든 소스 이미지를 삭제하시겠어요?')) return;
+  state.sources = [];
+  renderAll();
+}
+function removeSource(id) {
+  state.sources = state.sources.filter(s => s.id !== id);
+  renderAll();
+}
+
+/* =========================================================
+   CANVAS UTILS
+========================================================= */
+function resizeImageToCanvas(img, targetW, targetH, fit = 'contain', scale = 1.0,
+                              alignH = 'center', alignV = 'center', offsetX = 0, offsetY = 0) {
+  const canvas = document.createElement('canvas');
+  canvas.width = targetW;
+  canvas.height = targetH;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  const ar = img.width / img.height;
+  const tar = targetW / targetH;
+  let dw, dh, dx, dy;
+  // Always preserve aspect ratio. Fit modes: contain (fit within) or cover (fill, may crop).
+  if (fit === 'cover') {
+    if (ar > tar) { dh = targetH * scale; dw = dh * ar; }
+    else { dw = targetW * scale; dh = dw / ar; }
+  } else {
+    if (ar > tar) { dw = targetW * scale; dh = dw / ar; }
+    else { dh = targetH * scale; dw = dh * ar; }
+  }
+
+  if (alignH === 'left') dx = 0;
+  else if (alignH === 'right') dx = targetW - dw;
+  else dx = (targetW - dw) / 2;
+
+  if (alignV === 'top') dy = 0;
+  else if (alignV === 'bottom') dy = targetH - dh;
+  else dy = (targetH - dh) / 2;
+
+  dx += (offsetX / 100) * targetW;
+  dy += (offsetY / 100) * targetH;
+
+  ctx.drawImage(img, dx, dy, dw, dh);
+  return canvas;
+}
+
+/* Background removal via edge-sampled color + tolerance flood fill.
+   Works on white, cream, pastel, light-yellow, light-blue, etc. backgrounds —
+   not limited to pure white. Samples opaque pixels along all 4 edges to determine
+   the dominant background color, then floods inward removing pixels within tolerance.
+   White areas INSIDE the character (teeth, eyes, highlights) are preserved because
+   they aren't connected to the edges. */
+function removeBackground(img, sensitivity = 30) {
+  const canvas = document.createElement('canvas');
+  const w = canvas.width = img.width || img.naturalWidth;
+  const h = canvas.height = img.height || img.naturalHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const d = imgData.data;
+  const total = w * h;
+
+  // ─── 1. Sample opaque edge pixels to detect background color ───
+  const samples = [];
+  const tryCollect = (x, y) => {
+    if (x < 0 || y < 0 || x >= w || y >= h) return;
+    const i = (y * w + x) * 4;
+    if (d[i + 3] > 200) samples.push([d[i], d[i + 1], d[i + 2]]);
+  };
+  // 8 samples per edge → 32 candidates
+  for (let k = 0; k < 8; k++) {
+    const xx = Math.floor((w - 1) * k / 7);
+    const yy = Math.floor((h - 1) * k / 7);
+    tryCollect(xx, 0);
+    tryCollect(xx, h - 1);
+    tryCollect(0, yy);
+    tryCollect(w - 1, yy);
+  }
+  if (samples.length === 0) {
+    // All edges already transparent — nothing to do
+    return canvas;
+  }
+  // Use median per channel for robustness against outliers (e.g., character touching edge)
+  const med = (arr, ch) => {
+    const sorted = arr.map(s => s[ch]).sort((a, b) => a - b);
+    return sorted[Math.floor(sorted.length / 2)];
+  };
+  const bgR = med(samples, 0);
+  const bgG = med(samples, 1);
+  const bgB = med(samples, 2);
+
+  // ─── 2. Flood fill from all edges, removing pixels within tolerance ───
+  const visited = new Uint8Array(total);
+  const stack = [];
+  for (let x = 0; x < w; x++) { stack.push(x); stack.push((h - 1) * w + x); }
+  for (let y = 0; y < h; y++) { stack.push(y * w); stack.push(y * w + w - 1); }
+
+  while (stack.length > 0) {
+    const idx = stack.pop();
+    if (idx < 0 || idx >= total || visited[idx]) continue;
+    visited[idx] = 1;
+    const i = idx * 4;
+    // Already-transparent pixels: propagate through but don't modify
+    if (d[i + 3] < 30) {
+      const x = idx % w;
+      if (x > 0) stack.push(idx - 1);
+      if (x < w - 1) stack.push(idx + 1);
+      if (idx >= w) stack.push(idx - w);
+      if (idx < total - w) stack.push(idx + w);
+      continue;
+    }
+    // Color distance to detected background
+    const dr = Math.abs(d[i] - bgR);
+    const dg = Math.abs(d[i + 1] - bgG);
+    const db = Math.abs(d[i + 2] - bgB);
+    const dist = Math.max(dr, dg, db); // Chebyshev distance — strictest channel
+    if (dist > sensitivity) continue; // outside tolerance → keep
+    // Within tolerance → make transparent (soft edge near boundary)
+    if (dist < sensitivity * 0.6) {
+      d[i + 3] = 0;
+    } else {
+      // Feather: partial transparency for pixels at the edge of tolerance
+      const factor = (dist - sensitivity * 0.6) / (sensitivity * 0.4);
+      d[i + 3] = Math.round(d[i + 3] * factor);
+    }
+    const x = idx % w;
+    if (x > 0) stack.push(idx - 1);
+    if (x < w - 1) stack.push(idx + 1);
+    if (idx >= w) stack.push(idx - w);
+    if (idx < total - w) stack.push(idx + w);
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+  return canvas;
+}
+
+/* Heuristic: does this image likely have a non-transparent background that needs removal?
+   Returns true if at least 3 of the 4 corners are opaque AND similar in color. */
+function detectHasBackground(img) {
+  const w = img.width || img.naturalWidth;
+  const h = img.height || img.naturalHeight;
+  if (!w || !h) return false;
+  const cvs = document.createElement('canvas');
+  cvs.width = w; cvs.height = h;
+  const c = cvs.getContext('2d');
+  c.drawImage(img, 0, 0);
+  const data = c.getImageData(0, 0, w, h).data;
+  const corners = [
+    [0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]
+  ];
+  const opaque = [];
+  for (const [x, y] of corners) {
+    const i = (y * w + x) * 4;
+    if (data[i + 3] > 220) opaque.push([data[i], data[i + 1], data[i + 2]]);
+  }
+  if (opaque.length < 3) return false;
+  // Check if opaque corners are similar
+  const avg = opaque.reduce((a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]], [0, 0, 0])
+    .map(v => v / opaque.length);
+  for (const px of opaque) {
+    if (Math.abs(px[0] - avg[0]) > 25 || Math.abs(px[1] - avg[1]) > 25 || Math.abs(px[2] - avg[2]) > 25) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/* Cached effective image: returns either the original or the bg-removed version. */
+function getEffectiveImg(sourceIdx) {
+  const src = state.sources[sourceIdx];
+  if (!src) return null;
+  if (!src.bgRemove) return src.img;
+  const sensitivity = src.bgSensitivity != null ? src.bgSensitivity : 30;
+  if (!src._bgCache || src._bgCache.sensitivity !== sensitivity) {
+    src._bgCache = { canvas: removeBackground(src.img, sensitivity), sensitivity };
+  }
+  return src._bgCache.canvas;
+}
+
+function getTransform(sourceIdx) {
+  if (!state.sources[sourceIdx]) return null;
+  if (!state.sources[sourceIdx].transform) {
+    state.sources[sourceIdx].transform = {
+      scale: 100,
+      alignH: 'center',
+      alignV: 'center',
+      offsetX: 0,
+      offsetY: 0
+    };
+  }
+  return state.sources[sourceIdx].transform;
+}
+
+function placeImage(img, targetW, targetH, platform, sourceIdx, slot = null) {
+  const psc = state[platform].scale / 100;
+  let t;
+  if (slot === 'main' || slot === 'tab') {
+    const key = slot + 'Transform';
+    if (!state[platform][key]) {
+      state[platform][key] = { scale: 100, alignH: 'center', alignV: 'center', offsetX: 0, offsetY: 0 };
+    }
+    t = state[platform][key];
+  } else {
+    t = getTransform(sourceIdx) || { scale: 100, alignH: 'center', alignV: 'center', offsetX: 0, offsetY: 0 };
+  }
+  const effScale = psc * (t.scale / 100);
+  return resizeImageToCanvas(img, targetW, targetH, state[platform].fit, effScale, t.alignH, t.alignV, t.offsetX, t.offsetY);
+}
+
+/* Selection: state.{platform}.selected is now an object or null:
+     null
+     { type: 'sticker', idx: N }
+     { type: 'main' }
+     { type: 'tab' }
+*/
+function isSelectedSticker(platform, idx) {
+  const s = state[platform].selected;
+  return !!(s && s.type === 'sticker' && s.idx === idx);
+}
+function isSelectedSlot(platform, slot) {
+  const s = state[platform].selected;
+  return !!(s && s.type === slot);
+}
+function getActiveTransform(platform) {
+  const sel = state[platform].selected;
+  if (!sel) return null;
+  if (sel.type === 'sticker') return getTransform(sel.idx);
+  if (sel.type === 'main' || sel.type === 'tab') {
+    const key = sel.type + 'Transform';
+    if (!state[platform][key]) {
+      state[platform][key] = { scale: 100, alignH: 'center', alignV: 'center', offsetX: 0, offsetY: 0 };
+    }
+    return state[platform][key];
+  }
+  return null;
+}
+
+/* Korean → JP/EN/TW/TH auto-translation via MyMemory free API. */
+async function translateText(text, sourceLang, targetLang) {
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.responseData?.translatedText || null;
+  } catch (e) {
+    console.warn('Translate failed:', e);
+    return null;
+  }
+}
+
+async function translateKoreanToAll() {
+  const i = state.line.activeSticker;
+  if (!state.line.texts[i]) state.line.texts[i] = { kr: '', jp: '', en: '', tw: '', th: '' };
+  const t = state.line.texts[i];
+  const krText = (t.kr || '').trim();
+  if (!krText) { toast('한국어 텍스트를 먼저 입력해 주세요', true); return; }
+
+  const targets = [
+    { code: 'jp', api: 'ja' },
+    { code: 'en', api: 'en' },
+    { code: 'tw', api: 'zh-TW' },
+    { code: 'th', api: 'th' }
+  ];
+
+  showProgress('자동 번역 중', '온라인 API 호출…');
+  let done = 0;
+  for (const tg of targets) {
+    setProgress((done / targets.length) * 90, `→ ${tg.code.toUpperCase()}`);
+    const translated = await translateText(krText, 'ko', tg.api);
+    if (translated) {
+      t[tg.code] = translated;
+      const ta = document.querySelector(`#line-lang-grid textarea[data-lang="${tg.code}"]`);
+      if (ta) ta.value = translated;
+      updateSingleLangPreview(i, tg.code);
+    }
+    done++;
+  }
+  setProgress(100, '완료');
+  hideProgress();
+  toast('번역 완료 (기계번역이라 다듬어 주세요)');
+}
+
+/* Per-image background removal toggle */
+function toggleBgRemove(platform) {
+  const sel = state[platform].selected;
+  if (!sel || sel.type !== 'sticker') return;
+  const src = state.sources[sel.idx];
+  if (!src) return;
+  src.bgRemove = !src.bgRemove;
+  src._bgCache = null;
+  renderPlatform(platform);
+}
+
+function hexToRgb(hex) {
+  const m = hex.replace('#','').match(/.{2}/g);
+  return [parseInt(m[0],16), parseInt(m[1],16), parseInt(m[2],16)];
+}
+
+function addOutline(img, width, color) {
+  if (width <= 0) {
+    const c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    c.getContext('2d').drawImage(img, 0, 0);
+    return c;
+  }
+  const pad = Math.ceil(width);
+  const canvas = document.createElement('canvas');
+  canvas.width = img.width + pad * 2;
+  canvas.height = img.height + pad * 2;
+  const ctx = canvas.getContext('2d');
+
+  // Sample offsets along a ring
+  const samples = Math.max(8, Math.min(32, Math.ceil(width * 4)));
+  for (let i = 0; i < samples; i++) {
+    const a = (i / samples) * Math.PI * 2;
+    const ox = Math.cos(a) * width;
+    const oy = Math.sin(a) * width;
+    ctx.drawImage(img, pad + ox, pad + oy);
+  }
+  // Recolor to outline color
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const [r, g, b] = hexToRgb(color);
+  const d = data.data;
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] > 10) {
+      d[i] = r; d[i + 1] = g; d[i + 2] = b; d[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(data, 0, 0);
+  ctx.drawImage(img, pad, pad);
+  return canvas;
+}
+
+function drawTextOverlay(srcCanvas, text, opts) {
+  const c = document.createElement('canvas');
+  c.width = srcCanvas.width;
+  c.height = srcCanvas.height;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(srcCanvas, 0, 0);
+  if (!text || !text.trim()) return c;
+
+  // Scale size to canvas
+  const scale = c.height / 320; // base on 320 ref height
+  const fontSize = opts.size * scale;
+
+  ctx.font = `${opts.weight} ${fontSize}px ${opts.font}, sans-serif`;
+
+  // Horizontal alignment (default center)
+  const alignH = opts.alignH || 'center';
+  if (alignH === 'left') ctx.textAlign = 'left';
+  else if (alignH === 'right') ctx.textAlign = 'right';
+  else ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Word wrap basic
+  const maxWidth = c.width * 0.92;
+  const lines = wrapText(ctx, text, maxWidth);
+  const lineHeight = fontSize * 1.15;
+
+  // Base Y position from vertical preset
+  let y;
+  const totalH = lines.length * lineHeight;
+  if (opts.position === 'top') y = lineHeight * 0.6 + fontSize * 0.1;
+  else if (opts.position === 'bottom') y = c.height - totalH - fontSize * 0.1;
+  else y = (c.height - totalH) / 2;
+
+  // Base X position from horizontal preset
+  let x;
+  if (alignH === 'left') x = c.width * 0.05;
+  else if (alignH === 'right') x = c.width * 0.95;
+  else x = c.width / 2;
+
+  // Apply percentage offsets
+  x += ((opts.offsetX || 0) / 100) * c.width;
+  y += ((opts.offsetY || 0) / 100) * c.height;
+
+  if (opts.stroke > 0) {
+    ctx.lineWidth = opts.stroke * scale;
+    ctx.strokeStyle = opts.strokeColor;
+    ctx.lineJoin = 'round';
+    lines.forEach((ln, i) => {
+      ctx.strokeText(ln, x, y + i * lineHeight + lineHeight / 2);
+    });
+  }
+  ctx.fillStyle = opts.color;
+  lines.forEach((ln, i) => {
+    ctx.fillText(ln, x, y + i * lineHeight + lineHeight / 2);
+  });
+
+  return c;
+}
+
+function wrapText(ctx, text, maxWidth) {
+  // Try to wrap by spaces; for CJK, char-by-char
+  const explicitLines = text.split('\n');
+  const result = [];
+  for (const ln of explicitLines) {
+    if (ctx.measureText(ln).width <= maxWidth) {
+      result.push(ln);
+      continue;
+    }
+    const hasSpaces = /\s/.test(ln);
+    if (hasSpaces) {
+      const words = ln.split(' ');
+      let cur = '';
+      for (const w of words) {
+        const test = cur ? cur + ' ' + w : w;
+        if (ctx.measureText(test).width <= maxWidth) cur = test;
+        else { if (cur) result.push(cur); cur = w; }
+      }
+      if (cur) result.push(cur);
+    } else {
+      let cur = '';
+      for (const ch of ln) {
+        const test = cur + ch;
+        if (ctx.measureText(test).width <= maxWidth) cur = test;
+        else { if (cur) result.push(cur); cur = ch; }
+      }
+      if (cur) result.push(cur);
+    }
+  }
+  return result;
+}
+
+function canvasToBlob(canvas) {
+  return new Promise(res => canvas.toBlob(res, 'image/png'));
+}
+
+/* =========================================================
+   RENDER - SOURCES SIDEBAR
+========================================================= */
+function renderSources() {
+  const grid = document.getElementById('sources-grid');
+  const cnt = document.getElementById('src-count');
+  cnt.textContent = state.sources.length;
+  document.getElementById('stat-src').textContent = state.sources.length;
+  grid.innerHTML = '';
+  state.sources.forEach((s, i) => {
+    const t = document.createElement('div');
+    t.className = 'src-thumb';
+    t.innerHTML = `
+      <img src="${s.dataUrl}" alt="${s.name}">
+      <span class="idx">${String(i + 1).padStart(2, '0')}</span>
+      <button class="del" onclick="event.stopPropagation();removeSource('${s.id}')">×</button>
+    `;
+    t.title = s.name;
+    grid.appendChild(t);
+  });
+}
+
+/* =========================================================
+   RENDER - PLATFORM PREVIEWS
+========================================================= */
+function makeOptions(emptyLabel = '— 선택 —') {
+  let html = `<option value="-1">${emptyLabel}</option>`;
+  state.sources.forEach((s, i) => {
+    html += `<option value="${i}">${String(i+1).padStart(2,'0')} · ${s.name.slice(0, 22)}</option>`;
+  });
+  return html;
+}
+
+function renderMainTab(panelId, prefix, mainW, mainH, tabW, tabH) {
+  const cont = document.getElementById(`${prefix}-mt`);
+  const cfg = state[prefix];
+
+  const mainImg = cfg.mainIdx >= 0 && state.sources[cfg.mainIdx]
+    ? processForPlatform(getEffectiveImg(cfg.mainIdx), prefix, 'main', cfg.mainIdx)
+    : null;
+  const tabImg = cfg.tabIdx >= 0 && state.sources[cfg.tabIdx]
+    ? processForPlatform(getEffectiveImg(cfg.tabIdx), prefix, 'tab', cfg.tabIdx)
+    : null;
+
+  const mainOn = isSelectedSlot(prefix, 'main');
+  const tabOn = isSelectedSlot(prefix, 'tab');
+
+  cont.innerHTML = `
+    <div class="slot clickable${mainOn ? ' selected' : ''}" onclick="selectSlot('${prefix}','main')">
+      <div class="slot-label">메인 이미지 ${mainOn ? '· 편집중' : ''}</div>
+      <div class="slot-img">${mainImg ? canvasToImg(mainImg) : '<span style="color:var(--ink-3);font-size:11px">미선택</span>'}</div>
+      <select onclick="event.stopPropagation()" onchange="event.stopPropagation();state.${prefix}.mainIdx=parseInt(this.value);renderPlatform('${prefix}')">${makeOptions()}</select>
+      <div class="slot-spec">${mainW}×${mainH}</div>
+    </div>
+    <div class="slot clickable${tabOn ? ' selected' : ''}" onclick="selectSlot('${prefix}','tab')">
+      <div class="slot-label">탭 이미지 ${tabOn ? '· 편집중' : ''}</div>
+      <div class="slot-img">${tabImg ? canvasToImg(tabImg) : '<span style="color:var(--ink-3);font-size:11px">미선택</span>'}</div>
+      <select onclick="event.stopPropagation()" onchange="event.stopPropagation();state.${prefix}.tabIdx=parseInt(this.value);renderPlatform('${prefix}')">${makeOptions()}</select>
+      <div class="slot-spec">${tabW}×${tabH}</div>
+    </div>
+  `;
+  // set current value
+  const selects = cont.querySelectorAll('select');
+  selects[0].value = cfg.mainIdx;
+  selects[1].value = cfg.tabIdx;
+}
+
+function canvasToImg(canvas) {
+  return `<img src="${canvas.toDataURL()}">`;
+}
+
+function processForPlatform(img, platform, slot, sourceIdx = null) {
+  // Helper: do the resize using either placeImage (if sourceIdx given) or just platform settings.
+  // CRITICAL: slot must be passed through so main/tab use their own slot transforms,
+  // not the source sticker's transform.
+  const resize = (w, h) => {
+    if (sourceIdx !== null && sourceIdx !== undefined) {
+      return placeImage(img, w, h, platform, sourceIdx, slot);
+    }
+    return resizeImageToCanvas(img, w, h, state[platform].fit, state[platform].scale / 100);
+  };
+
+  if (platform === 'kakao') {
+    const t = SPEC.kakao[state.kakao.type];
+    if (slot === 'main' || slot === 'tab') {
+      return resize(96, 74);
+    }
+    return resize(t.w, t.h);
+  }
+  if (platform === 'line') {
+    if (slot === 'main') return resize(SPEC.line.mainW, SPEC.line.mainH);
+    if (slot === 'tab')  return resize(SPEC.line.tabW, SPEC.line.tabH);
+    return resize(SPEC.line.stickerW, SPEC.line.stickerH);
+  }
+  if (platform === 'ogq') {
+    let c;
+    if (slot === 'main') c = resize(SPEC.ogq.mainW, SPEC.ogq.mainH);
+    else if (slot === 'tab') c = resize(SPEC.ogq.tabW, SPEC.ogq.tabH);
+    else c = resize(SPEC.ogq.stickerW, SPEC.ogq.stickerH);
+
+    const applyBorder = state.ogq.borderTarget === 'all'
+      || (state.ogq.borderTarget === 'sticker' && slot === 'sticker');
+    if (applyBorder && state.ogq.border > 0) {
+      const bordered = addOutline(c, state.ogq.border, state.ogq.borderColor);
+      const target = document.createElement('canvas');
+      target.width = c.width; target.height = c.height;
+      const tctx = target.getContext('2d');
+      tctx.imageSmoothingEnabled = true;
+      tctx.imageSmoothingQuality = 'high';
+      const ar = bordered.width / bordered.height;
+      const tar = target.width / target.height;
+      let dw, dh, dx, dy;
+      if (ar > tar) { dw = target.width; dh = target.width / ar; }
+      else { dh = target.height; dw = target.height * ar; }
+      dx = (target.width - dw) / 2;
+      dy = (target.height - dh) / 2;
+      tctx.drawImage(bordered, dx, dy, dw, dh);
+      return target;
+    }
+    return c;
+  }
+}
+
+/* ------- KAKAO render ------- */
+function renderKakao() {
+  const spec = SPEC.kakao[state.kakao.type];
+  // pills
+  document.getElementById('kakao-pills').innerHTML = `
+    <span class="pill">${spec.label}</span>
+    <span class="pill">PNG · 투명배경</span>
+    <span class="pill">RGB · 72dpi</span>
+  `;
+  document.getElementById('kakao-info').textContent = `${spec.count} 종`;
+
+  document.getElementById('kakao-mt').innerHTML = `
+    <div class="slot" style="grid-column: span 2">
+      <div class="slot-label">참고</div>
+      <div style="padding:14px;font-size:11px;color:var(--ink-2);line-height:1.6">
+        카카오 이모티콘 스튜디오는 메인·탭 이미지를 별도 요구하지 않습니다. 시안 이미지 ${spec.count}종만 준비해 주세요.
+      </div>
+    </div>
+  `;
+
+  // Grid
+  const grid = document.getElementById('kakao-grid');
+  grid.classList.toggle('dark', state.kakao.dark);
+  syncDarkBtn('kakao');
+  renderTransformBar('kakao');
+
+  if (state.sources.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">PNG 파일을 업로드하면 자동으로 카카오 규격으로 변환됩니다.</div>`;
+    return;
+  }
+  grid.innerHTML = '';
+  const limit = Math.min(state.sources.length, spec.count);
+  for (let i = 0; i < limit; i++) {
+    const s = state.sources[i];
+    const c = placeImage(getEffectiveImg(i), spec.w, spec.h, 'kakao', i);
+    const cell = document.createElement('div');
+    cell.className = 'sticker-cell' + (isSelectedSticker('kakao', i) ? ' selected' : '');
+    cell.innerHTML = `<span class="num">${String(i+1).padStart(2,'0')}</span>`;
+    cell.appendChild(c);
+    cell.onclick = () => selectSticker('kakao', i);
+    grid.appendChild(cell);
+  }
+  if (state.sources.length < spec.count) {
+    for (let i = state.sources.length; i < spec.count; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'sticker-cell';
+      cell.innerHTML = `<span class="num">${String(i+1).padStart(2,'0')}</span><span style="color:var(--ink-3);font-size:11px">빈슬롯</span>`;
+      grid.appendChild(cell);
+    }
+  }
+}
+
+function syncDarkBtn(platform) {
+  const btn = document.querySelector(`#panel-${platform} .preview-mode-btn`);
+  if (btn) btn.classList.toggle('on', state[platform].dark);
+}
+
+/* ------- LINE render ------- */
+function renderLine() {
+  renderMainTab('panel-line', 'line', SPEC.line.mainW, SPEC.line.mainH, SPEC.line.tabW, SPEC.line.tabH);
+  document.getElementById('line-info').textContent = `${state.line.count} 종 · ${state.line.exportMode === 'bundle' ? '5개언어' : '단일언어'}`;
+
+  // Grid
+  const grid = document.getElementById('line-grid');
+  grid.classList.toggle('dark', state.line.dark);
+  syncDarkBtn('line');
+  renderTransformBar('line');
+
+  if (state.sources.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">PNG 파일을 업로드하면 라인 규격(최대 370×320)으로 변환됩니다.</div>`;
+  } else {
+    grid.innerHTML = '';
+    const limit = Math.min(state.sources.length, state.line.count);
+    for (let i = 0; i < limit; i++) {
+      const s = state.sources[i];
+      const baseC = placeImage(getEffectiveImg(i), SPEC.line.stickerW, SPEC.line.stickerH, 'line', i);
+      const text = state.line.texts[i]?.kr || '';
+      const withText = drawTextOverlay(baseC, text, {
+        size: state.line.size,
+        position: state.line.position,
+        alignH: state.line.alignH,
+        offsetX: state.line.offsetX,
+        offsetY: state.line.offsetY,
+        color: state.line.color,
+        stroke: state.line.stroke,
+        strokeColor: state.line.strokeColor,
+        weight: state.line.weight,
+        font: LANGS[0].font
+      });
+      const cell = document.createElement('div');
+      cell.className = 'sticker-cell' + (isSelectedSticker('line', i) ? ' selected' : '');
+      cell.style.aspectRatio = `${SPEC.line.stickerW}/${SPEC.line.stickerH}`;
+      cell.innerHTML = `<span class="num">${String(i+1).padStart(2,'0')}</span>`;
+      cell.appendChild(withText);
+      cell.onclick = () => {
+        state.line.activeSticker = i;
+        selectSticker('line', i);
+      };
+      grid.appendChild(cell);
+    }
+  }
+
+  renderLineLangs();
+}
+
+function renderLineLangs() {
+  const cont = document.getElementById('line-lang-grid');
+  cont.classList.toggle('dark', state.line.langDark);
+  const langDarkBtn = document.getElementById('line-lang-dark-btn');
+  if (langDarkBtn) langDarkBtn.classList.toggle('on', state.line.langDark);
+
+  const i = state.line.activeSticker;
+  document.getElementById('line-nav-label').textContent =
+    `스티커 ${i + 1} / ${state.line.count}`;
+
+  if (!state.line.texts[i]) state.line.texts[i] = { kr: '', jp: '', en: '', tw: '', th: '' };
+
+  // If we're still on the same sticker AND the cells are built, just update previews.
+  // This is critical: rebuilding textareas mid-IME-composition breaks Korean input.
+  if (cont.dataset.builtFor === String(i) && cont.querySelector('textarea')) {
+    updateAllLangPreviews(i);
+    return;
+  }
+
+  cont.dataset.builtFor = String(i);
+  buildLangCells(cont, i);
+}
+
+function buildLangCells(cont, i) {
+  const t = state.line.texts[i];
+  cont.innerHTML = '';
+  LANGS.forEach((lang) => {
+    const cell = document.createElement('div');
+    cell.className = 'lang-cell';
+    cell.innerHTML = `
+      <div class="lang-cell-head">
+        <span class="lang-name">${lang.name}</span>
+        <span class="lang-flag">${lang.flag}</span>
+      </div>
+      <div class="lang-preview" data-lang="${lang.code}"></div>
+      <textarea data-lang="${lang.code}" placeholder="${lang.sample}" style="font-family:${lang.font},var(--font-body)">${t[lang.code] || ''}</textarea>
+    `;
+    cont.appendChild(cell);
+  });
+
+  updateAllLangPreviews(i);
+
+  // Wire textarea listeners — they update state + preview canvas only, never rebuild DOM.
+  cont.querySelectorAll('textarea').forEach(ta => {
+    ta.addEventListener('input', e => {
+      const lang = e.target.dataset.lang;
+      const curIdx = state.line.activeSticker;
+      if (!state.line.texts[curIdx]) state.line.texts[curIdx] = { kr: '', jp: '', en: '', tw: '', th: '' };
+      state.line.texts[curIdx][lang] = e.target.value;
+      // Only update this language's preview canvas — do NOT touch textareas.
+      updateSingleLangPreview(curIdx, lang);
+      // Update main line grid kr-preview for this sticker only (lightweight).
+      if (lang === 'kr') updateLineMainGridCell(curIdx);
+    });
+  });
+}
+
+function updateAllLangPreviews(i) {
+  LANGS.forEach(lang => updateSingleLangPreview(i, lang.code));
+}
+
+function updateSingleLangPreview(i, langCode) {
+  const container = document.querySelector(`#line-lang-grid .lang-preview[data-lang="${langCode}"]`);
+  if (!container) return;
+  const src = state.sources[i];
+  const t = state.line.texts[i] || {};
+  const lang = LANGS.find(l => l.code === langCode);
+  container.innerHTML = '';
+  if (!src) {
+    container.innerHTML = `<span style="color:var(--ink-3);font-size:11px;font-family:var(--font-mono)">소스 없음</span>`;
+    return;
+  }
+  const baseC = placeImage(getEffectiveImg(i), SPEC.line.stickerW, SPEC.line.stickerH, 'line', i);
+  const withText = drawTextOverlay(baseC, t[langCode] || '', {
+    size: state.line.size,
+    position: state.line.position,
+    alignH: state.line.alignH,
+    offsetX: state.line.offsetX,
+    offsetY: state.line.offsetY,
+    color: state.line.color,
+    stroke: state.line.stroke,
+    strokeColor: state.line.strokeColor,
+    weight: state.line.weight,
+    font: lang.font
+  });
+  container.appendChild(withText);
+}
+
+function updateLineMainGridCell(i) {
+  // Replace the canvas inside the i-th cell of main line grid (no textarea side-effects)
+  const grid = document.getElementById('line-grid');
+  if (!grid) return;
+  const cells = grid.querySelectorAll('.sticker-cell');
+  const cell = cells[i];
+  if (!cell) return;
+  const src = state.sources[i];
+  if (!src) return;
+  const text = state.line.texts[i]?.kr || '';
+  const baseC = placeImage(getEffectiveImg(i), SPEC.line.stickerW, SPEC.line.stickerH, 'line', i);
+  const withText = drawTextOverlay(baseC, text, {
+    size: state.line.size,
+    position: state.line.position,
+    alignH: state.line.alignH,
+    offsetX: state.line.offsetX,
+    offsetY: state.line.offsetY,
+    color: state.line.color,
+    stroke: state.line.stroke,
+    strokeColor: state.line.strokeColor,
+    weight: state.line.weight,
+    font: LANGS[0].font
+  });
+  // Remove existing canvas, keep the num span
+  cell.querySelectorAll('canvas').forEach(c => c.remove());
+  cell.appendChild(withText);
+}
+
+function navLine(d) {
+  const max = Math.min(state.sources.length, state.line.count) - 1;
+  if (max < 0) return;
+  state.line.activeSticker = Math.max(0, Math.min(max, state.line.activeSticker + d));
+  state.line.selected = { type: 'sticker', idx: state.line.activeSticker };
+  renderLine();
+}
+
+/* ------- OGQ render ------- */
+function renderOgq() {
+  renderMainTab('panel-ogq', 'ogq', SPEC.ogq.mainW, SPEC.ogq.mainH, SPEC.ogq.tabW, SPEC.ogq.tabH);
+  document.getElementById('ogq-info').textContent = `24 종 · 라인 ${state.ogq.border}px`;
+
+  const grid = document.getElementById('ogq-grid');
+  grid.classList.toggle('dark', state.ogq.dark);
+  syncDarkBtn('ogq');
+  renderTransformBar('ogq');
+
+  if (state.sources.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">PNG 파일을 업로드하면 OGQ 규격(740×640)으로 변환됩니다.<br>라인 두께를 조절해 다크모드 가독성을 확인하세요.</div>`;
+    return;
+  }
+  grid.innerHTML = '';
+  const limit = Math.min(state.sources.length, 24);
+  for (let i = 0; i < limit; i++) {
+    const s = state.sources[i];
+    const c = processForPlatform(getEffectiveImg(i), 'ogq', 'sticker', i);
+    const cell = document.createElement('div');
+    cell.className = 'sticker-cell' + (isSelectedSticker('ogq', i) ? ' selected' : '');
+    cell.style.aspectRatio = `${SPEC.ogq.stickerW}/${SPEC.ogq.stickerH}`;
+    cell.innerHTML = `<span class="num">${String(i+1).padStart(2,'0')}</span>`;
+    cell.appendChild(c);
+    cell.onclick = () => selectSticker('ogq', i);
+    grid.appendChild(cell);
+  }
+  for (let i = state.sources.length; i < 24; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'sticker-cell';
+    cell.style.aspectRatio = `${SPEC.ogq.stickerW}/${SPEC.ogq.stickerH}`;
+    cell.innerHTML = `<span class="num">${String(i+1).padStart(2,'0')}</span><span style="color:var(--ink-3);font-size:11px">빈슬롯</span>`;
+    grid.appendChild(cell);
+  }
+}
+
+function renderPlatform(name) {
+  if (name === 'kakao') renderKakao();
+  if (name === 'line') renderLine();
+  if (name === 'ogq') renderOgq();
+  updateStats();
+}
+
+function renderAll() {
+  renderSources();
+  renderKakao();
+  renderLine();
+  renderOgq();
+  updateStats();
+}
+
+function updateStats() {
+  const sCount = state.sources.length;
+  const outCount =
+    Math.min(sCount, SPEC.kakao[state.kakao.type].count) +
+    Math.min(sCount, state.line.count) * (state.line.exportMode === 'bundle' ? 5 : 1) +
+    Math.min(sCount, 24) +
+    6; // main/tabs estimate
+  document.getElementById('stat-out').textContent = outCount;
+}
+
+function toggleDark(platform) {
+  state[platform].dark = !state[platform].dark;
+  renderPlatform(platform);
+}
+
+function toggleLangDark() {
+  state.line.langDark = !state.line.langDark;
+  renderLineLangs();
+}
+
+/* ============ Per-cell selection & transform =========== */
+function selectSticker(platform, idx) {
+  const cur = state[platform].selected;
+  if (cur && cur.type === 'sticker' && cur.idx === idx) {
+    state[platform].selected = null;
+  } else {
+    state[platform].selected = { type: 'sticker', idx };
+    if (platform === 'line') {
+      state.line.activeSticker = idx;
+    }
+  }
+  renderPlatform(platform);
+}
+
+function selectSlot(platform, slot) {
+  const cur = state[platform].selected;
+  if (cur && cur.type === slot) {
+    state[platform].selected = null;
+  } else {
+    state[platform].selected = { type: slot };
+  }
+  renderPlatform(platform);
+}
+
+function clearSelection(platform) {
+  state[platform].selected = null;
+  renderPlatform(platform);
+}
+
+function updateTransform(platform, patch) {
+  const t = getActiveTransform(platform);
+  if (!t) return;
+  Object.assign(t, patch);
+  renderPlatform(platform);
+}
+
+function nudge(platform, dx, dy) {
+  const t = getActiveTransform(platform);
+  if (!t) return;
+  t.offsetX = Math.max(-50, Math.min(50, t.offsetX + dx));
+  t.offsetY = Math.max(-50, Math.min(50, t.offsetY + dy));
+  renderPlatform(platform);
+}
+
+function resetTransform(platform) {
+  const sel = state[platform].selected;
+  if (!sel) return;
+  const reset = { scale: 100, alignH: 'center', alignV: 'center', offsetX: 0, offsetY: 0 };
+  if (sel.type === 'sticker') {
+    state.sources[sel.idx].transform = reset;
+  } else if (sel.type === 'main' || sel.type === 'tab') {
+    state[platform][sel.type + 'Transform'] = reset;
+  }
+  renderPlatform(platform);
+}
+
+function renderTransformBar(platform) {
+  const bar = document.getElementById(`${platform}-tbar`);
+  if (!bar) return;
+  const sel = state[platform].selected;
+  if (!sel) {
+    bar.classList.remove('show');
+    bar.innerHTML = '';
+    bar.dataset.builtFor = '';
+    return;
+  }
+  if (sel.type === 'sticker' && !state.sources[sel.idx]) {
+    bar.classList.remove('show');
+    bar.innerHTML = '';
+    bar.dataset.builtFor = '';
+    return;
+  }
+  const t = getActiveTransform(platform);
+  if (!t) {
+    bar.classList.remove('show');
+    return;
+  }
+  bar.classList.add('show');
+  const key = sel.type === 'sticker' ? `sticker:${sel.idx}` : sel.type;
+  if (bar.dataset.builtFor === key && bar.querySelector('.tb-scale-input')) {
+    syncTransformBar(bar, platform, sel, t);
+    return;
+  }
+  bar.dataset.builtFor = key;
+  bar.innerHTML = buildTransformBarHTML(platform, sel, t);
+}
+
+function buildTransformBarHTML(platform, sel, t) {
+  let label, sublabel = '', bgHtml = '';
+  if (sel.type === 'sticker') {
+    label = `#${String(sel.idx + 1).padStart(2,'0')}`;
+    sublabel = '선택됨';
+    const src = state.sources[sel.idx];
+    if (src) {
+      const bgOn = src.bgRemove;
+      const sens = src.bgSensitivity != null ? src.bgSensitivity : 30;
+      bgHtml = `
+        <div class="tb-group">
+          <span class="tb-glabel">배경 제거 <span class="tb-val tb-sens-val" style="display:${bgOn?'inline':'none'}">민감도 ${sens}</span></span>
+          <div class="tb-row">
+            <div class="tb-btns tb-bg">
+              <button class="${bgOn?'on':''}" onclick="toggleBgRemove('${platform}')" title="배경색을 자동 감지해 투명화">${bgOn?'✓ 적용':'배경 투명화'}</button>
+            </div>
+            <input type="range" min="10" max="80" value="${sens}" class="tb-sens-input"
+                   style="display:${bgOn?'inline-block':'none'};width:80px"
+                   oninput="updateBgSensitivity('${platform}', parseInt(this.value))">
+          </div>
+        </div>
+      `;
+    }
+  } else if (sel.type === 'main') {
+    label = '메인';
+    sublabel = '슬롯 선택됨';
+  } else if (sel.type === 'tab') {
+    label = '탭';
+    sublabel = '슬롯 선택됨';
+  }
+  return `
+    <div class="tb-info">
+      <span>${sublabel}</span>
+      <strong>${label}</strong>
+    </div>
+    <div class="tb-group">
+      <span class="tb-glabel">크기</span>
+      <div class="tb-row">
+        <input type="range" min="30" max="200" value="${t.scale}" class="tb-scale-input"
+               oninput="updateTransform('${platform}', { scale: parseInt(this.value) })">
+        <span class="tb-val tb-scale-val">${t.scale}%</span>
+      </div>
+    </div>
+    <div class="tb-group">
+      <span class="tb-glabel">가로 정렬</span>
+      <div class="tb-btns tb-align-h">
+        <button data-v="left" class="${t.alignH==='left'?'on':''}" onclick="updateTransform('${platform}', { alignH: 'left' })">◀</button>
+        <button data-v="center" class="${t.alignH==='center'?'on':''}" onclick="updateTransform('${platform}', { alignH: 'center' })">═</button>
+        <button data-v="right" class="${t.alignH==='right'?'on':''}" onclick="updateTransform('${platform}', { alignH: 'right' })">▶</button>
+      </div>
+    </div>
+    <div class="tb-group">
+      <span class="tb-glabel">세로 정렬</span>
+      <div class="tb-btns tb-align-v">
+        <button data-v="top" class="${t.alignV==='top'?'on':''}" onclick="updateTransform('${platform}', { alignV: 'top' })">▲</button>
+        <button data-v="center" class="${t.alignV==='center'?'on':''}" onclick="updateTransform('${platform}', { alignV: 'center' })">═</button>
+        <button data-v="bottom" class="${t.alignV==='bottom'?'on':''}" onclick="updateTransform('${platform}', { alignV: 'bottom' })">▼</button>
+      </div>
+    </div>
+    <div class="tb-group">
+      <span class="tb-glabel">미세 이동 (2%)</span>
+      <div class="tb-nudge">
+        <button onclick="nudge('${platform}', -2, 0)" title="왼쪽">◀</button>
+        <button onclick="nudge('${platform}', 0, -2)" title="위">▲</button>
+        <button onclick="nudge('${platform}', 0, 2)" title="아래">▼</button>
+        <button onclick="nudge('${platform}', 2, 0)" title="오른쪽">▶</button>
+      </div>
+    </div>
+    <div class="tb-group">
+      <span class="tb-glabel">오프셋</span>
+      <div class="tb-row">
+        <span class="tb-val tb-offset-x" style="min-width:auto">X ${t.offsetX>=0?'+':''}${t.offsetX}%</span>
+        <span class="tb-val tb-offset-y" style="min-width:auto">Y ${t.offsetY>=0?'+':''}${t.offsetY}%</span>
+      </div>
+    </div>
+    ${bgHtml}
+    <div class="tb-spacer"></div>
+    <div class="tb-actions">
+      <button class="tb-reset" onclick="resetTransform('${platform}')">초기화</button>
+      <button class="tb-close" onclick="clearSelection('${platform}')">×</button>
+    </div>
+  `;
+}
+
+function syncTransformBar(bar, platform, sel, t) {
+  const scaleVal = bar.querySelector('.tb-scale-val');
+  if (scaleVal) scaleVal.textContent = t.scale + '%';
+  const scaleInput = bar.querySelector('.tb-scale-input');
+  if (scaleInput && document.activeElement !== scaleInput) {
+    scaleInput.value = t.scale;
+  }
+  bar.querySelectorAll('.tb-align-h button').forEach(b =>
+    b.classList.toggle('on', b.dataset.v === t.alignH));
+  bar.querySelectorAll('.tb-align-v button').forEach(b =>
+    b.classList.toggle('on', b.dataset.v === t.alignV));
+  const offsetX = bar.querySelector('.tb-offset-x');
+  if (offsetX) offsetX.textContent = `X ${t.offsetX>=0?'+':''}${t.offsetX}%`;
+  const offsetY = bar.querySelector('.tb-offset-y');
+  if (offsetY) offsetY.textContent = `Y ${t.offsetY>=0?'+':''}${t.offsetY}%`;
+  // BG section only present on sticker selection
+  if (sel.type === 'sticker') {
+    const src = state.sources[sel.idx];
+    const on = !!(src && src.bgRemove);
+    const sens = src && src.bgSensitivity != null ? src.bgSensitivity : 30;
+    const bgBtn = bar.querySelector('.tb-bg button');
+    if (bgBtn) {
+      bgBtn.classList.toggle('on', on);
+      bgBtn.textContent = on ? '✓ 적용' : '배경 투명화';
+    }
+    const sensInput = bar.querySelector('.tb-sens-input');
+    if (sensInput) {
+      sensInput.style.display = on ? 'inline-block' : 'none';
+      if (document.activeElement !== sensInput) sensInput.value = sens;
+    }
+    const sensVal = bar.querySelector('.tb-sens-val');
+    if (sensVal) {
+      sensVal.style.display = on ? 'inline' : 'none';
+      sensVal.textContent = '민감도 ' + sens;
+    }
+  }
+}
+
+function updateBgSensitivity(platform, val) {
+  const sel = state[platform].selected;
+  if (!sel || sel.type !== 'sticker') return;
+  const src = state.sources[sel.idx];
+  if (!src) return;
+  src.bgSensitivity = val;
+  src._bgCache = null;
+  renderPlatform(platform);
+}
+
+function applyBgRemoveToAll(platform) {
+  if (state.sources.length === 0) { toast('PNG 파일을 먼저 업로드해 주세요', true); return; }
+  state.sources.forEach(s => {
+    s.bgRemove = true;
+    s._bgCache = null;
+  });
+  renderPlatform(platform);
+  toast(`${state.sources.length}개 이미지에 배경 투명화 적용됨`);
+}
+
+function clearBgRemoveAll(platform) {
+  state.sources.forEach(s => {
+    s.bgRemove = false;
+    s._bgCache = null;
+  });
+  renderPlatform(platform);
+  toast('배경 투명화 전체 해제');
+}
+
+/* =========================================================
+   CONTROL BINDINGS
+========================================================= */
+// Tabs
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+  });
+});
+
+// Segmented buttons helper
+function bindSeg(id, onChange) {
+  const seg = document.getElementById(id);
+  seg.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      seg.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      onChange(b.dataset.val);
+    });
+  });
+}
+
+bindSeg('kakao-type-seg', v => { state.kakao.type = v; renderKakao(); updateStats(); });
+bindSeg('kakao-fit-seg', v => { state.kakao.fit = v; renderKakao(); });
+document.getElementById('kakao-scale').addEventListener('input', e => {
+  state.kakao.scale = parseInt(e.target.value);
+  document.getElementById('kakao-scale-val').textContent = state.kakao.scale + '%';
+  renderKakao();
+});
+document.getElementById('kakao-res').addEventListener('change', e => { state.kakao.res = e.target.value; });
+document.getElementById('kakao-naming').addEventListener('change', e => { state.kakao.naming = e.target.value; });
+
+document.getElementById('line-count').addEventListener('change', e => {
+  state.line.count = parseInt(e.target.value);
+  if (state.line.activeSticker >= state.line.count) state.line.activeSticker = 0;
+  renderLine();
+});
+bindSeg('line-fit-seg', v => { state.line.fit = v; renderLine(); });
+document.getElementById('line-scale').addEventListener('input', e => {
+  state.line.scale = parseInt(e.target.value);
+  document.getElementById('line-scale-val').textContent = state.line.scale + '%';
+  renderLine();
+});
+bindSeg('line-pos-seg', v => { state.line.position = v; renderLine(); });
+bindSeg('line-h-seg', v => { state.line.alignH = v; renderLine(); });
+document.getElementById('line-offset-x').addEventListener('input', e => {
+  state.line.offsetX = parseInt(e.target.value);
+  document.getElementById('line-offset-x-val').textContent = (state.line.offsetX >= 0 ? '+' : '') + state.line.offsetX + '%';
+  renderLine();
+});
+document.getElementById('line-offset-y').addEventListener('input', e => {
+  state.line.offsetY = parseInt(e.target.value);
+  document.getElementById('line-offset-y-val').textContent = (state.line.offsetY >= 0 ? '+' : '') + state.line.offsetY + '%';
+  renderLine();
+});
+bindSeg('line-export-seg', v => { state.line.exportMode = v; updateStats(); });
+document.getElementById('line-size').addEventListener('input', e => {
+  state.line.size = parseInt(e.target.value);
+  document.getElementById('line-size-val').textContent = state.line.size + 'px';
+  renderLine();
+});
+document.getElementById('line-stroke').addEventListener('input', e => {
+  state.line.stroke = parseInt(e.target.value);
+  document.getElementById('line-stroke-val').textContent = state.line.stroke + 'px';
+  renderLine();
+});
+document.getElementById('line-color').addEventListener('input', e => { state.line.color = e.target.value; renderLine(); });
+document.getElementById('line-stroke-color').addEventListener('input', e => { state.line.strokeColor = e.target.value; renderLine(); });
+document.getElementById('line-weight').addEventListener('change', e => { state.line.weight = e.target.value; renderLine(); });
+
+document.getElementById('ogq-border').addEventListener('input', e => {
+  state.ogq.border = parseInt(e.target.value);
+  document.getElementById('ogq-border-val').textContent = state.ogq.border + 'px';
+  // sync preset
+  document.querySelectorAll('#ogq-preset-seg button').forEach(b => {
+    b.classList.toggle('on', parseInt(b.dataset.val) === state.ogq.border);
+  });
+  renderOgq();
+});
+document.getElementById('ogq-border-color').addEventListener('input', e => { state.ogq.borderColor = e.target.value; renderOgq(); });
+document.getElementById('ogq-border-target').addEventListener('change', e => { state.ogq.borderTarget = e.target.value; renderOgq(); });
+bindSeg('ogq-preset-seg', v => {
+  state.ogq.border = parseInt(v);
+  document.getElementById('ogq-border').value = v;
+  document.getElementById('ogq-border-val').textContent = v + 'px';
+  renderOgq();
+});
+bindSeg('ogq-fit-seg', v => { state.ogq.fit = v; renderOgq(); });
+document.getElementById('ogq-scale').addEventListener('input', e => {
+  state.ogq.scale = parseInt(e.target.value);
+  document.getElementById('ogq-scale-val').textContent = state.ogq.scale + '%';
+  renderOgq();
+});
+
+/* =========================================================
+   EXPORT
+========================================================= */
+function showProgress(title, msg) {
+  document.getElementById('progress-title').textContent = title;
+  document.getElementById('progress-msg').textContent = msg;
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('progress').classList.add('show');
+}
+function setProgress(pct, msg) {
+  document.getElementById('progress-fill').style.width = pct + '%';
+  if (msg) document.getElementById('progress-msg').textContent = msg;
+}
+function hideProgress() {
+  document.getElementById('progress').classList.remove('show');
+}
+
+function toast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', isError);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Produce all canvases for a platform
+async function buildKakaoOutputs() {
+  const out = [];
+  const spec = SPEC.kakao[state.kakao.type];
+  const limit = Math.min(state.sources.length, spec.count);
+  for (let i = 0; i < limit; i++) {
+    const c = placeImage(getEffectiveImg(i), spec.w, spec.h, 'kakao', i);
+    const name = state.kakao.naming === 'zero'
+      ? String(i + 1).padStart(2, '0') + '.png'
+      : (i + 1) + '.png';
+    out.push({ name, canvas: c });
+  }
+  return out;
+}
+
+async function buildLineOutputs(langCode = null) {
+  // If langCode given, single language; else returns map of languages
+  const limit = Math.min(state.sources.length, state.line.count);
+  const result = {};
+
+  const languages = langCode ? LANGS.filter(l => l.code === langCode) : LANGS;
+  if (state.line.exportMode === 'single') {
+    languages.splice(0, languages.length, LANGS[0]);
+  }
+
+  for (const lang of languages) {
+    const files = [];
+    // Main
+    if (state.line.mainIdx >= 0 && state.sources[state.line.mainIdx]) {
+      const c = placeImage(getEffectiveImg(state.line.mainIdx), SPEC.line.mainW, SPEC.line.mainH, 'line', state.line.mainIdx, 'main');
+      files.push({ name: 'main.png', canvas: c });
+    }
+    // Tab
+    if (state.line.tabIdx >= 0 && state.sources[state.line.tabIdx]) {
+      const c = placeImage(getEffectiveImg(state.line.tabIdx), SPEC.line.tabW, SPEC.line.tabH, 'line', state.line.tabIdx, 'tab');
+      files.push({ name: 'tab.png', canvas: c });
+    }
+    // Stickers
+    for (let i = 0; i < limit; i++) {
+      const base = placeImage(getEffectiveImg(i), SPEC.line.stickerW, SPEC.line.stickerH, 'line', i);
+      const text = (state.line.texts[i] && state.line.texts[i][lang.code]) || '';
+      const withText = drawTextOverlay(base, text, {
+        size: state.line.size,
+        position: state.line.position,
+        alignH: state.line.alignH,
+        offsetX: state.line.offsetX,
+        offsetY: state.line.offsetY,
+        color: state.line.color,
+        stroke: state.line.stroke,
+        strokeColor: state.line.strokeColor,
+        weight: state.line.weight,
+        font: lang.font
+      });
+      files.push({ name: String(i + 1).padStart(2, '0') + '.png', canvas: withText });
+    }
+    result[lang.code] = files;
+  }
+  return result;
+}
+
+async function buildOgqOutputs() {
+  const files = [];
+  if (state.ogq.mainIdx >= 0 && state.sources[state.ogq.mainIdx]) {
+    files.push({ name: 'main.png', canvas: processForPlatform(getEffectiveImg(state.ogq.mainIdx), 'ogq', 'main', state.ogq.mainIdx) });
+  }
+  if (state.ogq.tabIdx >= 0 && state.sources[state.ogq.tabIdx]) {
+    files.push({ name: 'tab.png', canvas: processForPlatform(getEffectiveImg(state.ogq.tabIdx), 'ogq', 'tab', state.ogq.tabIdx) });
+  }
+  const limit = Math.min(state.sources.length, 24);
+  for (let i = 0; i < limit; i++) {
+    files.push({
+      name: (i + 1) + '.png',
+      canvas: processForPlatform(getEffectiveImg(i), 'ogq', 'sticker', i)
+    });
+  }
+  return files;
+}
+
+async function exportPlatform(name) {
+  if (state.sources.length === 0) { toast('PNG 파일을 먼저 업로드해 주세요', true); return; }
+  showProgress(`${name.toUpperCase()} ZIP 생성 중`, '이미지 처리하고 있어요…');
+  await new Promise(r => setTimeout(r, 50));
+
+  const zip = new JSZip();
+  let total = 0, done = 0;
+
+  if (name === 'kakao') {
+    const outs = await buildKakaoOutputs();
+    total = outs.length;
+    for (const o of outs) {
+      const blob = await canvasToBlob(o.canvas);
+      zip.file(`kakao_${state.kakao.type}/${o.name}`, blob);
+      done++; setProgress(done / total * 90, `${done}/${total} · ${o.name}`);
+    }
+    addReadme(zip, 'kakao');
+  } else if (name === 'line') {
+    const langs = await buildLineOutputs();
+    Object.values(langs).forEach(arr => total += arr.length);
+    for (const code in langs) {
+      for (const o of langs[code]) {
+        const blob = await canvasToBlob(o.canvas);
+        zip.file(`line_${code}/${o.name}`, blob);
+        done++; setProgress(done / total * 90, `${code} · ${done}/${total}`);
+      }
+    }
+    addReadme(zip, 'line');
+  } else if (name === 'ogq') {
+    const outs = await buildOgqOutputs();
+    total = outs.length;
+    for (const o of outs) {
+      const blob = await canvasToBlob(o.canvas);
+      zip.file(`ogq/${o.name}`, blob);
+      done++; setProgress(done / total * 90, `${done}/${total} · ${o.name}`);
+    }
+    addReadme(zip, 'ogq');
+  }
+
+  setProgress(95, 'ZIP 압축 중…');
+  const blob = await zip.generateAsync({ type: 'blob' });
+  downloadBlob(blob, `sticker-forge_${name}_${dateStamp()}.zip`);
+  hideProgress();
+  toast(`${name.toUpperCase()} ZIP 다운로드 완료`);
+}
+
+async function exportAll() {
+  if (state.sources.length === 0) { toast('PNG 파일을 먼저 업로드해 주세요', true); return; }
+  showProgress('통합 ZIP 생성 중', '3개 플랫폼 동시 처리…');
+  await new Promise(r => setTimeout(r, 50));
+
+  const zip = new JSZip();
+
+  setProgress(10, '카카오 처리 중…');
+  const k = await buildKakaoOutputs();
+  for (const o of k) zip.file(`KAKAO_${state.kakao.type}/${o.name}`, await canvasToBlob(o.canvas));
+
+  setProgress(40, '라인 처리 중…');
+  const langs = await buildLineOutputs();
+  for (const code in langs) {
+    for (const o of langs[code]) {
+      zip.file(`LINE_${code}/${o.name}`, await canvasToBlob(o.canvas));
+    }
+  }
+
+  setProgress(75, 'OGQ 처리 중…');
+  const ogq = await buildOgqOutputs();
+  for (const o of ogq) zip.file(`OGQ/${o.name}`, await canvasToBlob(o.canvas));
+
+  addReadme(zip, 'all');
+
+  setProgress(95, 'ZIP 압축 중…');
+  const blob = await zip.generateAsync({ type: 'blob' });
+  downloadBlob(blob, `sticker-forge_ALL_${dateStamp()}.zip`);
+  hideProgress();
+  toast('전체 ZIP 다운로드 완료');
+}
+
+function addReadme(zip, platform) {
+  const lines = [
+    '═══════════════════════════════════════',
+    '  STICKER FORGE · 출시 작업 결과물',
+    '═══════════════════════════════════════',
+    '생성일: ' + new Date().toLocaleString('ko-KR'),
+    '소스 이미지: ' + state.sources.length + '개',
+    '',
+  ];
+  if (platform === 'kakao' || platform === 'all') {
+    const sp = SPEC.kakao[state.kakao.type];
+    lines.push('▶ 카카오 이모티콘');
+    lines.push(`  타입: ${state.kakao.type} / ${sp.label}`);
+    lines.push(`  업로드: emoticonstudio.kakao.com`);
+    lines.push('');
+  }
+  if (platform === 'line' || platform === 'all') {
+    lines.push('▶ 라인 크리에이터스 마켓');
+    lines.push(`  스티커: ${state.line.count}종 · 최대 ${SPEC.line.stickerW}×${SPEC.line.stickerH}`);
+    lines.push(`  메인: ${SPEC.line.mainW}×${SPEC.line.mainH} / 탭: ${SPEC.line.tabW}×${SPEC.line.tabH}`);
+    lines.push(`  언어: ${state.line.exportMode === 'bundle' ? '한·일·영·중번체·태 5개' : '단일'}`);
+    lines.push(`  업로드: creator.line.me`);
+    lines.push('');
+  }
+  if (platform === 'ogq' || platform === 'all') {
+    lines.push('▶ OGQ 마켓');
+    lines.push(`  스티커: 24종 · ${SPEC.ogq.stickerW}×${SPEC.ogq.stickerH}`);
+    lines.push(`  메인: ${SPEC.ogq.mainW}×${SPEC.ogq.mainH} / 탭: ${SPEC.ogq.tabW}×${SPEC.ogq.tabH}`);
+    lines.push(`  라인 두께: ${state.ogq.border}px ${state.ogq.borderColor}`);
+    lines.push(`  업로드: creators.ogq.me`);
+    lines.push('');
+  }
+  zip.file('README.txt', lines.join('\n'));
+}
+
+async function exportResize(preset) {
+  if (state.sources.length === 0) { toast('PNG 파일을 먼저 업로드해 주세요', true); return; }
+  const map = {
+    'kakao-static':   { w: 360, h: 360, prefix: 'kakao_static' },
+    'kakao-animated': { w: 360, h: 360, prefix: 'kakao_animated' },
+    'kakao-big':      { w: 540, h: 540, prefix: 'kakao_big' },
+    'line-sticker':   { w: 370, h: 320, prefix: 'line_sticker' },
+    'line-main':      { w: 240, h: 240, prefix: 'line_main' },
+    'line-tab':       { w: 96,  h: 74,  prefix: 'line_tab' },
+    'ogq-sticker':    { w: 740, h: 640, prefix: 'ogq_sticker' },
+    'ogq-main':       { w: 240, h: 240, prefix: 'ogq_main' },
+    'ogq-tab':        { w: 96,  h: 74,  prefix: 'ogq_tab' }
+  };
+  const cfg = map[preset];
+  showProgress(`리사이즈 · ${cfg.w}×${cfg.h}`, '처리 중…');
+  await new Promise(r => setTimeout(r, 50));
+  const zip = new JSZip();
+  for (let i = 0; i < state.sources.length; i++) {
+    const c = resizeImageToCanvas(getEffectiveImg(i), cfg.w, cfg.h);
+    const blob = await canvasToBlob(c);
+    zip.file(`${cfg.prefix}/${String(i+1).padStart(2,'0')}.png`, blob);
+    setProgress((i+1) / state.sources.length * 90, `${i+1}/${state.sources.length}`);
+  }
+  setProgress(95, 'ZIP 압축…');
+  const blob = await zip.generateAsync({ type: 'blob' });
+  downloadBlob(blob, `resize_${cfg.prefix}_${dateStamp()}.zip`);
+  hideProgress();
+  toast(`${cfg.w}×${cfg.h} 리사이즈 완료`);
+}
+
+function downloadBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function dateStamp() {
+  const d = new Date();
+  return d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') +
+    '_' + String(d.getHours()).padStart(2,'0') + String(d.getMinutes()).padStart(2,'0');
+}
+
+/* =========================================================
+   PDF EXPORT
+========================================================= */
+async function exportPDF() {
+  if (state.sources.length === 0) { toast('PNG 파일을 먼저 업로드해 주세요', true); return; }
+  showProgress('PDF 리포트 생성', '레이아웃 구성 중…');
+  await new Promise(r => setTimeout(r, 50));
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+  const W = 210, H = 297;
+
+  // ===== COVER =====
+  doc.setFillColor(13, 12, 10);
+  doc.rect(0, 0, W, H, 'F');
+  doc.setTextColor(245, 239, 229);
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('STICKER FORGE · RELEASE WORK REPORT', 20, 25);
+
+  doc.setDrawColor(251, 191, 36);
+  doc.setLineWidth(0.4);
+  doc.line(20, 28, W - 20, 28);
+
+  doc.setFontSize(36);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Emoticon', 20, 60);
+  doc.text('Release Pack', 20, 75);
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(163, 158, 149);
+  doc.text('Generated: ' + new Date().toLocaleString('en-US'), 20, 90);
+  doc.text('Sources: ' + state.sources.length + ' PNG file(s)', 20, 96);
+  doc.text('Platforms: Kakao · LINE · OGQ', 20, 102);
+
+  // Specs table
+  doc.setFontSize(9);
+  doc.setTextColor(245, 239, 229);
+  doc.text('SPECIFICATIONS', 20, 120);
+  doc.setDrawColor(46, 43, 39);
+  doc.line(20, 122, 80, 122);
+
+  const specs = [
+    ['Platform', 'Type', 'Count', 'Sticker', 'Main', 'Tab'],
+    ['Kakao', 'Static',    '32', '360×360', '—', '—'],
+    ['Kakao', 'Animated',  '24', '360×360', '—', '—'],
+    ['Kakao', 'Big',       '16', '540×540', '—', '—'],
+    ['LINE',  'Static',    state.line.count, '370×320', '240×240', '96×74'],
+    ['OGQ',   'Static',    '24', '740×640', '240×240', '96×74'],
+  ];
+  let sy = 128;
+  specs.forEach((row, ri) => {
+    if (ri === 0) {
+      doc.setFontSize(7);
+      doc.setTextColor(107, 102, 94);
+    } else {
+      doc.setFontSize(9);
+      doc.setTextColor(245, 239, 229);
+    }
+    let x = 20;
+    row.forEach((cell, ci) => {
+      doc.text(String(cell), x, sy);
+      x += [22, 22, 18, 26, 22, 22][ci];
+    });
+    sy += ri === 0 ? 5 : 6;
+  });
+
+  // Bottom mark
+  doc.setFontSize(7);
+  doc.setTextColor(107, 102, 94);
+  doc.text('Auto-generated by Sticker Forge · v1.0', 20, H - 15);
+
+  setProgress(20, '카카오 페이지…');
+  await addPlatformPage(doc, 'KAKAO', state.kakao.type, await buildKakaoOutputs());
+
+  setProgress(50, '라인 페이지…');
+  const lineOut = await buildLineOutputs();
+  for (const code in lineOut) {
+    await addPlatformPage(doc, 'LINE · ' + code.toUpperCase(), 'static', lineOut[code]);
+  }
+
+  setProgress(80, 'OGQ 페이지…');
+  await addPlatformPage(doc, 'OGQ', 'sticker', await buildOgqOutputs());
+
+  setProgress(95, 'PDF 저장…');
+  doc.save(`sticker-forge_report_${dateStamp()}.pdf`);
+  hideProgress();
+  toast('PDF 리포트 다운로드 완료');
+}
+
+async function addPlatformPage(doc, title, subtype, items) {
+  doc.addPage();
+  const W = 210, H = 297;
+
+  // Background
+  doc.setFillColor(255, 253, 248);
+  doc.rect(0, 0, W, H, 'F');
+
+  // Header
+  doc.setTextColor(13, 12, 10);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text('STICKER FORGE / ' + title, 20, 18);
+
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text(title, 20, 32);
+
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(107, 102, 94);
+  doc.text('Type: ' + subtype + '  ·  Items: ' + items.length, 20, 40);
+
+  doc.setDrawColor(13, 12, 10);
+  doc.setLineWidth(0.3);
+  doc.line(20, 44, W - 20, 44);
+
+  // Grid of thumbnails
+  const cols = 5, gap = 4, marginX = 20, startY = 54;
+  const cellW = (W - marginX * 2 - gap * (cols - 1)) / cols;
+  const cellH = cellW;
+  let col = 0, row = 0;
+
+  for (let i = 0; i < items.length; i++) {
+    const x = marginX + col * (cellW + gap);
+    const y = startY + row * (cellH + gap + 6);
+
+    if (y + cellH > H - 20) {
+      // new page
+      doc.addPage();
+      doc.setFillColor(255, 253, 248);
+      doc.rect(0, 0, W, H, 'F');
+      doc.setTextColor(107, 102, 94);
+      doc.setFontSize(8);
+      doc.text(title + ' (continued)', 20, 18);
+      doc.line(20, 22, W - 20, 22);
+      col = 0; row = 0;
+    }
+
+    // background
+    doc.setFillColor(248, 245, 238);
+    doc.rect(x, y, cellW, cellH, 'F');
+
+    const dataUrl = items[i].canvas.toDataURL('image/png');
+    try {
+      doc.addImage(dataUrl, 'PNG', x, y, cellW, cellH, undefined, 'FAST');
+    } catch (e) { console.warn(e); }
+
+    doc.setFontSize(7);
+    doc.setTextColor(107, 102, 94);
+    doc.text(items[i].name, x, y + cellH + 4);
+
+    col++;
+    if (col >= cols) { col = 0; row++; }
+  }
+}
+
+/* =========================================================
+   TEXT DRAG — Drag text on language previews to free-position
+========================================================= */
+let textDragTarget = null;
+
+function syncTextPositionControls() {
+  document.querySelectorAll('#line-pos-seg button').forEach(b =>
+    b.classList.toggle('on', b.dataset.val === state.line.position));
+  document.querySelectorAll('#line-h-seg button').forEach(b =>
+    b.classList.toggle('on', b.dataset.val === state.line.alignH));
+  const ox = document.getElementById('line-offset-x');
+  const oy = document.getElementById('line-offset-y');
+  if (ox && document.activeElement !== ox) ox.value = state.line.offsetX;
+  if (oy && document.activeElement !== oy) oy.value = state.line.offsetY;
+  const oxv = document.getElementById('line-offset-x-val');
+  const oyv = document.getElementById('line-offset-y-val');
+  if (oxv) oxv.textContent = (state.line.offsetX >= 0 ? '+' : '') + state.line.offsetX + '%';
+  if (oyv) oyv.textContent = (state.line.offsetY >= 0 ? '+' : '') + state.line.offsetY + '%';
+}
+
+function applyTextDrag(e) {
+  if (!textDragTarget) return;
+  const canvas = textDragTarget.querySelector('canvas');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return;
+  const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+  const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+  // Snap to center+offset model so full canvas is reachable
+  state.line.alignH = 'center';
+  state.line.position = 'center';
+  state.line.offsetX = Math.round(Math.max(-50, Math.min(50, xPct - 50)));
+  state.line.offsetY = Math.round(Math.max(-50, Math.min(50, yPct - 50)));
+  syncTextPositionControls();
+  // Light-touch update: only the visible lang previews of the active sticker
+  const i = state.line.activeSticker;
+  LANGS.forEach(lang => updateSingleLangPreview(i, lang.code));
+}
+
+document.addEventListener('mousedown', e => {
+  const preview = e.target.closest('.lang-preview');
+  if (!preview) return;
+  if (!preview.closest('#line-lang-grid')) return;
+  const i = state.line.activeSticker;
+  if (!state.sources[i]) return;
+  textDragTarget = preview;
+  preview.classList.add('dragging');
+  applyTextDrag(e);
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', e => {
+  if (!textDragTarget) return;
+  applyTextDrag(e);
+});
+
+document.addEventListener('mouseup', () => {
+  if (!textDragTarget) return;
+  textDragTarget.classList.remove('dragging');
+  textDragTarget = null;
+  // Catch the main grid up to the dragged position
+  renderLine();
+});
+
+// Touch support — same flow, single-finger tracking
+document.addEventListener('touchstart', e => {
+  const preview = e.target.closest('.lang-preview');
+  if (!preview) return;
+  if (!preview.closest('#line-lang-grid')) return;
+  const i = state.line.activeSticker;
+  if (!state.sources[i]) return;
+  textDragTarget = preview;
+  preview.classList.add('dragging');
+  const t = e.touches[0];
+  applyTextDrag({ clientX: t.clientX, clientY: t.clientY });
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchmove', e => {
+  if (!textDragTarget) return;
+  const t = e.touches[0];
+  applyTextDrag({ clientX: t.clientX, clientY: t.clientY });
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchend', () => {
+  if (!textDragTarget) return;
+  textDragTarget.classList.remove('dragging');
+  textDragTarget = null;
+  renderLine();
+});
+
+/* =========================================================
+   INIT
+========================================================= */
+// Pre-set value displays
+document.getElementById('line-size-val').textContent = state.line.size + 'px';
+document.getElementById('line-stroke-val').textContent = state.line.stroke + 'px';
+document.getElementById('ogq-border-val').textContent = state.ogq.border + 'px';
+document.getElementById('kakao-scale-val').textContent = state.kakao.scale + '%';
+document.getElementById('line-scale-val').textContent = state.line.scale + '%';
+document.getElementById('ogq-scale-val').textContent = state.ogq.scale + '%';
+
+// Wait for fonts to load before initial render
+document.fonts.ready.then(() => {
+  renderAll();
+});
+
+// Initial empty state render
+renderAll();
+</script>
+</body>
 </html>
