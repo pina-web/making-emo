@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#FAFBFC">
 <title>클래스노트</title>
@@ -241,7 +244,7 @@ table.grid{border-collapse:collapse;width:100%;min-width:640px;background:#fff;b
 const K='classnote_v1';
 const DAYS=['일','월','화','수','목','금','토'];
 let D={groups:[],students:[],sessions:{},makeups:[],slots:['14:00','15:00','16:00','17:00','18:00','19:00','20:00']};
-let cur=new Date(), page='today', editG=null, editS=null;
+let cur=new Date(), page='month', editG=null, editS=null;
 
 /* ---------- store ---------- */
 function load(){try{const r=localStorage.getItem(K);if(r)D=Object.assign(D,JSON.parse(r));}catch(e){}}
